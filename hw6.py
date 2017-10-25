@@ -16,6 +16,7 @@ def hw_6_2(start, end, step):
         k = 1.28
         t_ss=-(c*np.exp(-a*x)/((a**2)*k))+(x/l)*(t_0 - (c*(1-np.exp(-a*l)))/((a**2)*k))+(c/((a**2)*k)) +273
         diff = abs(40 +273 - max(t_ss))
+        print('MAX TEMP FOR c = %f is %f' % (c, max(t_ss)))
         plt.plot(x, t_ss, label=str(c))
         if diff < maximum:
             maximum = diff
@@ -98,18 +99,20 @@ def hw_6_3(x_grid, c):
 #################################
 #################################
 
-#hw_6_2(3700, 4000, 1000)
+hw_6_2(248, 4000, 40)
 #plt.legend()
 #axes = plt.gca()
 #plt.ylabel('Temperature [K]')
 #plt.xlabel('x [m]')
 #plt.show()
-hw_6_2_b(3767.5675)
+#hw_6_2_b(3767.5675)
 
-for x_grid in [10, 30, 100, 300]:
-   hw_6_3(x_grid, 3767.5675)
+#for x_grid in [10, 30, 100, 300]:
+#   hw_6_3(x_grid, 3767.5675)
 
-plt.legend()
-plt.ylabel('Temperature [K]')
-plt.xlabel('x [m]')
-plt.show()
+#plt.legend()
+#plt.ylabel('Temperature [K]')
+#plt.xlabel('x [m]')
+#plt.show()
+
+
