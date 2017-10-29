@@ -86,15 +86,36 @@
        \textbf{$ \alpha$} & \textbf{3.75e-6} & [$ \frac{m^2}{s} $] \\
        \hline
     \end{tabularx}
-    \caption {Problem Constants. Derived constants are bolded.}
+    \caption {Problem Constants. Derived constants are in bold.}
     \label{tab:constants}
 \end{table}
 
+Differential Equation:
+\[\frac{1}{\alpha} \cdot \frac{dT}{dt} = \frac{1}{r^2} \frac{d}{dr} r^2 \frac{dT}{dr}\]
 
-Solve:
-\[ T(r,t) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})})\]
+Boundary Conditions:
+\[T(0,t) = finite \quad OR \quad \frac{dT}{dr} (r = 0, t) = 0\]
+\[\frac{dT}{dr} (r = R) = 0 \]
 
-\section{}
+Initial Condition:
+\[T(r,0) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) \]
+
+\section{C. Numerical Solution}
+
+Expanding the differential equation:
+\[\frac{1}{\alpha} \cdot \frac{dT}{dt} = \frac{2}{r} \frac{dT}{dr} + \frac{d^2T}{dr^2}\]
+
+Applying the finite difference method, central for r and explicit for t:
+\[\frac{1}{\alpha} \cdot \frac{T_k^{u+1} - T_k^{u}}{\Delta t} = \frac{2}{r_k} \; (\frac{T^u_{k+1}-T^u_{k-1}}{2 \Delta r}) + \frac{T^u_{k-1} - 2T^u_k + T^u_{k+1}}{\Delta r^2}\]
+
+where u is the temporal step and k is the spacial step.
+
+Solving for $T_k^u$:
+
+\[T_k^u = \frac{\frac{2}{r_k} (\frac{T^u_{k+1}-T^u_{k-1}}{2 \Delta r}) + \frac{T^u_{k-1} + T^u_{k+1}}{\Delta r^2} - \frac{T_k^{u+1}}{\alpha \Delta t}}
+{\frac{2}{\Delta r^2} - \frac{1}{\alpha \Delta t }}\]
+
+
 
 \section{Appendix A}
 
@@ -156,9 +177,29 @@ Applying the second boundary condition,
 \[0 =  -C_2 \beta sin(\beta R) \]
 \[sin(\beta R) = 0  \]
 \[\beta R = \pi, 2\pi, 3\pi ... \]
-\[\beta_n = \frac{n\pi}{R} where \quad n = 1 \; to \; \infty \]
+\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
 
+Solving for $\Gamma(t)$:
+\[\frac{1}{\alpha  \Gamma} \cdot \frac{d\Gamma}{dt} = -\beta_n^2 \]
+\[\frac{1}{\alpha  \Gamma} \cdot \frac{d\Gamma}{dt} = -\beta_n^2 \alpha \Gamma \]
 
+\[\Gamma(t) = A_1 e^{-\alpha \beta_n^2 t }\]
+
+This makes $\overline{T}(r,t)$:
+\[\overline{T}(r,t) = A_n e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
+\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
+
+Solving back for $T(r,t)$:
+\[T(r,t) = \frac{A_n}{r} e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
+
+Applying initial condition and orthogonality:
+\[T(r,0) = \frac{A_n}{r} sin(\beta_n r) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) \]
+
+\[A_n = \frac{\int_{0}^{R} \frac{T_0 r^3 \sin(\beta_n r)}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) dr}{\int_{0}^{R} r^2 \sin^{2}(\beta_n r) dr}\]
+
+The analytical solution is:
+\[T(r,t) = \frac{\int_{0}^{R} \frac{T_0 r^3 \sin(\beta_n r)}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) dr}{r \int_{0}^{R} r^2 \sin^{2}(\beta_n r) dr} e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
+\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
 
 \subsection{Code1}
 \begin{minted}{xml}
