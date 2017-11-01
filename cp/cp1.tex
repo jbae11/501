@@ -201,6 +201,114 @@ The analytical solution is:
 \[T(r,t) = \frac{\int_{0}^{R} \frac{T_0 r^3 \sin(\beta_n r)}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) dr}{r \int_{0}^{R} r^2 \sin^{2}(\beta_n r) dr} e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
 \[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
 
+
+
+
+\subsection{Analytical solution by defining new temperature}
+
+\[T'(r,t) = T(r,t) - T_{ss}\]
+
+\[T'(r,t) + T_{ss} = T(r,t) \]
+
+
+where $T_{ss}$ is:
+
+
+\[0 = \frac{1}{r^2} \frac{d}{dr} r^2 (\frac{dT_{ss}}{dr})\]
+
+\[\frac{C_1}{r^2} = \frac{dT_{ss}}{dr}\]
+
+\[-\frac{C_1}{r} + C_2 = T_{ss}\]
+
+applying BC:
+
+at r = 0, finite, makes  $C_1 = 0$
+
+\[T_{ss} = C_2\]
+
+Plugging the new definition into the original differential equation:
+
+differential equation becomes:
+
+\[\frac{1}{\alpha} (\frac{dT'}{dt} + \frac{dT_{ss}}{dt}) = \frac{1}{r^2} \frac{d}{dr} r^2 (\frac{dT'}{dr} + \frac{dT_{ss}}{dr})\]
+
+Considering \[\frac{dT_{ss}}{dt} = \frac{dT_{ss}}{dr} = 0\],
+
+\[\frac{1}{\alpha} \cdot \frac{dT'}{dt} = \frac{1}{r^2} \frac{d}{dr} r^2 \cdot \frac{dT'}{dr} \]
+
+Boundary Conditions:
+\[T'(0,t)  = finite \]
+\[\frac{dT'}{dr} (r = R) = 0 \]
+
+Initial Condition:
+\[T'(r,0) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) - C_2 \]
+
+set:
+\[T'(r,t) = \frac{\overline{T'}}{r} \]
+
+
+\[\frac{1}{\alpha} \cdot \frac{d\overline{T'}}{dt} \frac{1}{r} = \frac{1}{r^2} \frac{d}{dr} r^2 (\frac{d\overline{T'}}{dr} \frac{1}{r} - \frac{1}{r^2} \overline{T'}) \]
+
+\[\frac{1}{\alpha} \cdot \frac{d\overline{T'}}{dt} = \frac{1}{r} \frac{d}{dr} (\frac{d\overline{T'}}{dr} r - \overline{T'}) \]
+
+\[\frac{1}{\alpha} \cdot \frac{d\overline{T'}}{dt} = \frac{1}{r} (\frac{d^2\overline{T'}}{dr^2} r + \frac{d\overline{T'}}{dr} - \frac{d\overline{T'}}{dr}) \]
+
+\[\frac{1}{\alpha} \cdot \frac{d\overline{T'}}{dt} = \frac{d^2\overline{T'}}{dr^2} \]
+
+turns into a cartesian problem.
+
+Applying Separation of Variables:
+\[\overline{T'}(r,t) = \Gamma (t) \Psi (r)  \]
+
+Boundary Conditions:
+
+\[\Psi(r = 0) = finite \]
+\[\frac{d\Psi}{dr} (r = R) = 0 \]
+
+Applying the new variables, dividing both sides by $\Gamma (t) \Psi (r) $,
+and setting it to a new variable $ -\beta^2 $:
+\[\frac{1}{\alpha  \Gamma} \cdot \frac{d\Gamma}{dt} = \frac{d^2 \Psi}{dr^2} \frac{1}{\Psi} = -\beta^2 \] 
+
+Solving for $\Psi$ first:
+\[\frac{d^2 \Psi}{dr^2} \frac{1}{\Psi} = -\beta^2 \]
+
+\[\frac{d^2 \Psi}{dr^2} + \beta^2 \Psi = 0 \]
+
+\[\Psi (r) = C_1 sin(\beta r) + C_2 cos(\beta r) \]
+
+Applying the first boundary condition,
+interpreting as $\frac{d\Psi}{dr} (r = 0) = 0$, $C_1 = 0 $
+
+Applying the second boundary condition,
+\[0 =  -C_2 \beta sin(\beta R) \]
+\[sin(\beta R) = 0  \]
+\[\beta R = \pi, 2\pi, 3\pi ... \]
+\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
+
+Solving for $\Gamma(t)$:
+\[\frac{1}{\alpha  \Gamma} \cdot \frac{d\Gamma}{dt} = -\beta_n^2 \]
+\[\frac{1}{\alpha  \Gamma} \cdot \frac{d\Gamma}{dt} = -\beta_n^2 \alpha \Gamma \]
+
+\[\Gamma(t) = A_1 e^{-\alpha \beta_n^2 t }\]
+
+This makes $\overline{T'}(r,t)$:
+\[\overline{T'}(r,t) = A_n e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
+\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
+
+Solving back for $T'(r,t)$:
+\[T'(r,t) = \frac{A_n}{r} e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
+
+Applying initial condition and orthogonality:
+\[T'(r,0) = \frac{A_n}{r} sin(\beta_n r) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) + C_2\]
+
+\[A_n = \frac{\int_{0}^{R}  r^3 sin(\beta_n r) (\frac{T_0}{2} \cdot (1-\cos{\frac{\pi r}{R}}) + C_2) dr} {\int_{0}^{R} r^2 \sin^2{\beta_n r} dr }\]
+
+The analytical solution is:
+\[T'(r,t) = \frac{\int_{0}^{R}  r^3 sin(\beta_n r) (\frac{T_0}{2} \cdot (1-\cos{\frac{\pi r}{R}}) + T_{ss}) dr} {\int_{0}^{R} r^2 \sin^2{\beta_n r} dr } e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
+
+\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
+
+\[T = \frac{\int_{0}^{R}  r^3 sin(\beta_n r) (\frac{T_0}{2} \cdot (1-\cos{\frac{\pi r}{R}}) + T_{ss}) dr} {\int_{0}^{R} r^2 \sin^2{\beta_n r} dr } e^{-\alpha \beta_n^2 t} sin(\beta_n r) + T_{ss} \]
 \subsection{Code1}
 \begin{minted}{xml}
 <institution>
