@@ -177,7 +177,7 @@ Applying the second boundary condition,
 \[0 =  -C_2 \beta sin(\beta R) \]
 \[sin(\beta R) = 0  \]
 \[\beta R = \pi, 2\pi, 3\pi ... \]
-\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
+\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 0 \; to \; \infty \]
 
 Solving for $\Gamma(t)$:
 \[\frac{1}{\alpha  \Gamma} \cdot \frac{d\Gamma}{dt} = -\beta_n^2 \]
@@ -187,7 +187,7 @@ Solving for $\Gamma(t)$:
 
 This makes $\overline{T}(r,t)$:
 \[\overline{T}(r,t) = A_n e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
-\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
+\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 0 \; to \; \infty \]
 
 Solving back for $T(r,t)$:
 \[T(r,t) = \frac{A_n}{r} e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
@@ -199,7 +199,7 @@ Applying initial condition and orthogonality:
 
 The analytical solution is:
 \[T(r,t) = \frac{\int_{0}^{R} \frac{T_0 r^3 \sin(\beta_n r)}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) dr}{r \int_{0}^{R} r^2 \sin^{2}(\beta_n r) dr} e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
-\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
+\[\beta_n = \frac{n\pi}{R} \quad where \quad n = 0 \; to \; \infty \]
 
 \subsection{Code1}
 \begin{minted}{xml}
