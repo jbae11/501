@@ -19,6 +19,9 @@
 \usepackage{enumitem} % for a) b) c) lists
 \usepackage{tabularx}
 \usepackage{cleveref}
+\usepackage{xcolor}
+\usepackage{soul}
+\newcommand{\mathcolorbox}[2]{\colorbox{#1}{$\displaystyle #2$}}
 
 \newcolumntype{b}{X}
 \newcolumntype{s}{>{\hsize=.5\hsize}X}
@@ -102,20 +105,44 @@ Initial Condition:
 
 \section{C. Numerical Solution}
 
-Expanding the differential equation:
+
 \[\frac{1}{\alpha} \cdot \frac{dT}{dt} = \frac{2}{r} \frac{dT}{dr} + \frac{d^2T}{dr^2}\]
 
 Applying the finite difference method, central for r and explicit for t:
-\[\frac{1}{\alpha} \cdot \frac{T_k^{u+1} - T_k^{u}}{\Delta t} = \frac{2}{r_k} \; (\frac{T^u_{k+1}-T^u_{k-1}}{2 \Delta r}) + \frac{T^u_{k-1} - 2T^u_k + T^u_{k+1}}{\Delta r^2}\]
+\[\frac{1}{\alpha} \cdot \frac{T_k^{u} - T_k^{u-1}}{\Delta t} = \frac{2}{r_k} \; (\frac{T^{u-1}_{k+1}-T^{u-1}_{k-1}}{2 \Delta r}) + \frac{T^{u-1}_{k-1} - 2T^{u-1}_k + T^{u-1}_{k+1}}{\Delta r^2}\]
 
 where u is the temporal step and k is the spacial step.
 
-Solving for $T_k^u$:
+Solving for $T_{k}^{u+1}$:
 
-\[T_k^u = \frac{\frac{2}{r_k} (\frac{T^u_{k+1}-T^u_{k-1}}{2 \Delta r}) + \frac{T^u_{k-1} + T^u_{k+1}}{\Delta r^2} - \frac{T_k^{u+1}}{\alpha \Delta t}}
-{\frac{2}{\Delta r^2} - \frac{1}{\alpha \Delta t }}\]
+\centering{
+    \mathcolorbox{yellow}{
+    T_{k}^{u+1} = T_k^u + \alpha \frac{\Delta t }{\Delta r \cdot r} (T_{k+1}^u + T_{k-1}^u) + \alpha * \frac{\Delta t}{(\Delta r)^2} (T_{k+1}^{u} -2T_k^u + T_{k-1}^u) }
+}
 
 
+Applying neuman boundary condition at r=0:
+\[\frac{dT(0,t)}{dr} =0 \]
+\[\frac{T_1^u - T_{-1}^u}{2\Delta r} =0 \]
+\[T_1^u = T_{-1}^u\]
+
+This gives:
+
+\centering{
+    \mathcolorbox{yellow}{T_0^{u+1} = T_0^u + \alpha * \frac{\Delta t}{(\Delta r)^2} (2T_{1}^{u} -2T_0^u ) }
+}
+
+
+Applying neuman boundary condition at r=R (k=K at r=R):
+\[-k \frac{dT(R,t)}{dr} =0 \]
+\[\frac{T_{K+1}^u - T_{K-1}^u}{2\Delta r} =0 \]
+\[T_{K+1}^u = T_{K-1}^u\]
+
+This gives:
+
+\centering{
+    \mathcolorbox{yellow}{T_K^{u+1} = T_K^u + \alpha * \frac{\Delta t}{(\Delta r)^2} (2T_{K-1}^{u} -2T_K^u )}
+}
 
 \section{Appendix A}
 
@@ -309,6 +336,12 @@ The analytical solution is:
 \[\beta_n = \frac{n\pi}{R} \quad where \quad n = 1 \; to \; \infty \]
 
 \[T = \frac{\int_{0}^{R}  r^3 sin(\beta_n r) (\frac{T_0}{2} \cdot (1-\cos{\frac{\pi r}{R}}) + T_{ss}) dr} {\int_{0}^{R} r^2 \sin^2{\beta_n r} dr } e^{-\alpha \beta_n^2 t} sin(\beta_n r) + T_{ss} \]
+
+Since the solution from section 4.1 with $n=0$ covers the 
+steady state case, this problem is redundant and provides
+no new insight into the problem from section 4.1.
+
+
 \subsection{Code1}
 \begin{minted}{xml}
 <institution>
