@@ -69,7 +69,7 @@
 	\onehalfspacing
 	\thispagestyle{empty}
 
-\section{Problem Definition}
+\section*{Problem Definition}
 
 \Cref{tab:constants} lists the constants used in the problem.
 
@@ -104,16 +104,17 @@ Initial Condition:
 \[T(r,0) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) \]
 
 
-\section{Analytical Term Study}
+\section*{Analytical Term Study}
 For the term study, it is speculated that for higher time values,
 less terms ($\beta_n$) would be needed for reasonable convergence,
 since a higher time value would cause the exponential term, which has
-$\beta$ in, less of a contribution.
+$\beta$ in, less of a contribution. The solved equation from Appendix A
+proves this mathematically:
 
 \[\overline{T}(r,t) = \sum_{n=1}^{\infty} A_n e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
 
 The study is conducted where different number of betas are used for each timestep.
-Six timesteps are used: $t = 0, 4, 17.7, 31.1, 62.2, 75$.
+Seven timesteps are used: $t = 0, 2, 4, 17.7, 31.1, 62.2, 75$.
 A 'reasonable convergence' is met when $$ \sum_{r=0}^{R} (|r_{r}^n - r_{r}^{n+1}|) < 1e-3$$
 Where n is the number of terms used for the temperature profile.
 
@@ -126,6 +127,7 @@ Where n is the number of terms used for the temperature profile.
        \textbf{Time [secs]} & \textbf{Number of Terms for Convergence}  \\
        \hline
        0 & 17 \\
+       2 & 7 \\
        4 & 5 \\
        17.7 & 3 \\
        31.1 & 2 \\
@@ -140,7 +142,7 @@ Where n is the number of terms used for the temperature profile.
 
 As expected, as time increases, the number of terms for convergence
 becomes minimal. 
-\Cref{fig:0}, \ref{fig:4}, \ref{fig:17}, \ref{fig:31}, \ref{fig:62}, \ref{fig:75} show the 
+\Cref{fig:0}, \ref{fig:2}, \ref{fig:4}, \ref{fig:17}, \ref{fig:31}, \ref{fig:62}, \ref{fig:75} show the 
 convergence study where the temperature profile is plotted with
 increasing number of terms. Note the visible difference is negligible.
 Also note the y axis range change for different times.
@@ -152,6 +154,14 @@ Also note the y axis range change for different times.
   \end{center}
   \caption{Number of terms convergence study for t = 0.}
   \label{fig:0}
+\end{figure}
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{terms_2.png}
+  \end{center}
+  \caption{Number of terms convergence study for t = 2.}
+  \label{fig:2}
 \end{figure}
 
 \begin{figure}[htbp!]
@@ -195,12 +205,177 @@ Also note the y axis range change for different times.
   \label{fig:75}
 \end{figure}
 
+The converged $T(r,t)$ for all seven cases is shown in \cref{fig:conv}.
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{converged.png}
+  \end{center}
+  \caption{Converged Temperature Profiles for all Seven Timesteps.}
+  \label{fig:conv}
+\end{figure}
+
+Refer to appendix D for eigenvalue calculations.
+
 
 \pagebreak
 
-\section{Appendix A}
+\section*{Numerical Solution}
 
-\subsection{Simple Energy Balance}
+Considering previous plots, it can be safely assumed that the sphere
+reaches steady state after 70 seconds. Setting the maximum time to 70
+seconds, the grid refinement study is done.
+
+An important thing to note in the numerical solution is the role of
+$\frac{dt}{dr}$. Varying grid size, thus varying dt and dr may cause
+this term to either be close to zero or very big, which produces 
+confusing results. The error depends on the ratio of the two 
+terms (eg. the term will go to infinity if dr is much smaller
+than dt). To prevent this from happening, only one grid size is 
+changed at a time, and the other grid is set so that the $\frac{dt}{dr}$
+term does not mess up the entire equation.
+
+For the grid refinement study of spatial terms (r grid), a fixed 
+time is set, and the grid size is varied. For the grid refinement
+study of temporal terms (t grid), a fixed spatial grid is set
+and the spatial terms are varied.
+
+\subsection*{Spatial Grid Refinement Study}
+\Cref{fig:r_10s} and \ref{fig:r_30s} show the grid refinement study
+done on time 10 and 30 seconds.
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{grid_ref_10s.png}
+  \end{center}
+  \caption{Grid Refinement Study for the temperature at 10 seconds.}
+  \label{fig:r_10s}
+\end{figure}
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{grid_ref_30s.png}
+  \end{center}
+  \caption{Grid Refinement Study for the temperature at 30 seconds.}
+  \label{fig:r_30s}
+\end{figure}
+
+With grid size under 5, the temperature profile is far from the converged.
+However, when the grid size becomes larger than 15 (dr around 0.15cm),
+the temperature profile converges for both timesteps. After that point,
+increasing the grid size does not affect the fidelity of the temperature
+profile much more, which brings the 'Goldilocks' grid size to about 20.
+
+\subsection*{Temporal Grid Refinement Study}
+
+With the problem with $\frac{dt}{dr}$, the r grid is set as a function
+of r grid (see code for details) to prevent the equation from blowing up.
+The time grid points used are 10, 50, 100 and 300, shown in \cref{fig:t_10},
+\ref{fig:t_50}, \ref{fig:t_100}, \ref{fig:t_300}.
+
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{t_grid_10.png}
+  \end{center}
+  \caption{Time Grid Refinement Study for t grid = 10}
+  \label{fig:t_10}
+\end{figure}
+
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{t_grid_50.png}
+  \end{center}
+  \caption{Time Grid Refinement Study for t grid = 50}
+  \label{fig:t_50}
+\end{figure}
+
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{t_grid_100.png}
+  \end{center}
+  \caption{Time Grid Refinement Study for t grid = 100}
+  \label{fig:t_100}
+\end{figure}
+
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{t_grid_300.png}
+  \end{center}
+  \caption{Time Grid Refinement Study for t grid = 300}
+  \label{fig:t_300}
+\end{figure}
+
+As the time grid reaches 300 (or $dt = 0.23$), the temperature profiles
+are a smooth curve, like the analytical solution. Thus, it can be stated
+that a time grid size of 300 is adequate for obtaining a good solution.
+
+
+\subsection*{Analytical vs Numerical}
+For the difference between the analytical and numerical solution,
+both methods are plotted against each other in a fixed time.
+The plots are in \Cref{fig:conv_2}, \ref{fig:conv_4}, \ref{fig:conv_177},
+\ref{fig:conv_311}, \ref{fig:conv_622}.
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{conv_2s.png}
+  \end{center}
+  \caption{Comparison of Analytical and Numerical Solutions at t = 2s.}
+  \label{fig:conv_2}
+\end{figure}
+
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{conv_4s.png}
+  \end{center}
+  \caption{Comparison of Analytical and Numerical Solutions at t = 4s.}
+  \label{fig:conv_4}
+\end{figure}
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{conv_177s.png}
+  \end{center}
+  \caption{Comparison of Analytical and Numerical Solutions at t = 17.7s.}
+  \label{fig:conv_177}
+\end{figure}
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{conv_311s.png}
+  \end{center}
+  \caption{Comparison of Analytical and Numerical Solutions at t = 31.1s.}
+  \label{fig:conv_311}
+\end{figure}
+
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{conv_622s.png}
+  \end{center}
+  \caption{Comparison of Analytical and Numerical Solutions at t = 62.2s.}
+  \label{fig:conv_622}
+\end{figure}
+
+As notably so, there is very little difference between the numerical and analytical
+solution, given ample temporal and spatial grid size. 
+
+
+\section*{Conclusion}
+Through this exercise, a conclusion can be drawn that the numerical
+and analytical solutions for the temperature profile of the sphere
+has little difference. A grid refinement study is done both temporally
+and spatially, to find a balance between fidelity and efficiency. 
+
+\pagebreak
+\section*{Appendix A}
+
+\subsection*{Simple Energy Balance}
 Since there is no heat generation or leakage (r=R is insulated), 
 the steady state temperature is a constant throughout the sphere.
 
@@ -261,7 +436,7 @@ The steady state is plotted in figure \cref{fig:ss}.
 \end{figure}
 
 
-\section{Sketch of Different Temperature Profiles in Time}
+\subsection*{Sketch of Different Temperature Profiles in Time}
 The time evolution of the temperature profile starts from t=0,
 with the two boundary points, $T(0,0) = 0$ and $T(R,0) = T_0$.
 Through time, the temperature profile flattens out, since the 
@@ -278,7 +453,7 @@ A sketch is made in \Cref{fig:sketch}.
 \end{figure}
 
 
-\section{Solution of $T(r,t)$ for $t > 0$}
+\section*{Solution of $T(r,t)$ for $t > 0$}
 Since the numerical value of $T_{ss}$ has been found
 through the energy balance, that can be added to the solution
 for $T(r,t)$ for $t>0$.
@@ -286,9 +461,9 @@ for $T(r,t)$ for $t>0$.
 The application and solution for $T(r,t)$ is shown in Appendix B.
 
 \pagebreak
-\section{Appendix B}
+\section*{Appendix B}
 
-\subsection{Analytical solution for solving T(r,t) directly}
+\subsection*{Analytical solution for solving T(r,t) directly}
 
 \[\frac{1}{\alpha} \cdot \frac{dT}{dt} = \frac{1}{r^2} \frac{d}{dr} r^2 \frac{dT}{dr}\]
 
@@ -397,7 +572,7 @@ T(r,t) = \sum_{n=1}^{\infty} A_n \frac{\sin(\beta_n r)}{r} e^{-\beta_n^2 \alpha 
 
 
 
-\subsection{Analytical solution by defining new temperature}
+\subsection*{Analytical solution by defining new temperature}
 
 \[T'(r,t) = T(r,t) - T_{ss}\]
 
@@ -501,13 +676,91 @@ The analytical solution is:
 
 \[T = \frac{\int_{0}^{R}  r^3 sin(\beta_n r) (\frac{T_0}{2} \cdot (1-\cos{\frac{\pi r}{R}}) + T_{ss}) dr} {\int_{0}^{R} r^2 \sin^2{\beta_n r} dr } e^{-\alpha \beta_n^2 t} sin(\beta_n r) + T_{ss} \]
 
-Since the solution from section 4.1 with $n=0$ covers the 
+Since the solution from the previous question with $n=0$ covers the 
 steady state case, this problem is redundant and provides
-no new insight into the problem from section 4.1.
+no new insight into the problem.
+
+\section*{Appendix D - Eigenvalues}
+
+The eigenvalues are acquired by a script that assesses zero
+points from the equation:
+\begin{minted}{python}
+import numpy as np
+
+
+def beta_equation(beta):
+    y = 3*beta - np.tan(beta * 3)
+    return y 
+
+R = 3
+k = 0.15
+rho = 8000. / 1000000.
+cp = 500
+alpha = k / (rho*cp)
+T_0 = 1
+
+points = np.arange(0, 1e2, 1e-5)
+pot_betas = []
+count = 0
+flag = 1
+for beta in points:
+    if beta_equation(beta) > 0:
+        flag = 0
+    elif beta_equation(beta) < 0 and flag == 0:
+        pot_betas.append(beta)
+        count = count + 1
+        flag = 1
+betas = pot_betas
+
+\end{minted}
+
+The acquired eigenvalues are listed in \cref{tab:eign}. Only the first
+25 terms are shown for brevity.
+
+\begin{table}[h]
+     \centering
+    \begin{tabularx}{\textwidth}{bb}
+       \hline
+       \textbf{Term Number ($n$)} & \textbf{Eigenvalue ($\beta_n$)}  \\
+       \hline
+        0 & 0 \\
+        1 & 1.49781\\ 
+        2 & 2.57509\\ 
+        3 & 3.63471\\ 
+        4 & 4.68874\\ 
+        5 & 5.74026\\ 
+        6 & 6.79044\\ 
+        7 & 7.83982\\ 
+        8 & 8.88869\\ 
+        9 & 9.9372\\ 
+        10 & 10.98547\\ 
+        11 & 12.03355\\ 
+        12 & 13.08148\\ 
+        13 & 14.12931\\ 
+        14 & 15.17705\\ 
+        15 & 16.22472\\ 
+        16 & 17.27233\\ 
+        17 & 18.3199\\ 
+        18 & 19.36742\\ 
+        19 & 20.41492\\ 
+        20 & 21.46238\\ 
+        21 & 22.50982\\ 
+        22 & 23.55723\\ 
+        23 & 24.60463\\ 
+        24 & 25.65201\\ 
+        25 & 26.69938\\ 
+
+        \hline
+    \end{tabularx}
+    \caption {First 25 eigenvalues acquired.}
+    \label{tab:eign}
+\end{table}
 
 
 
-\section{Appendix C - Numerical Solution}
+
+
+\section*{Appendix D - Numerical Solution}
 
 
 \[\frac{1}{\alpha} \cdot \frac{dT}{dt} = \frac{2}{r} \frac{dT}{dr} + \frac{d^2T}{dr^2}\]
@@ -549,7 +802,7 @@ This gives:
 }
 
 
-\subsection{Numerical Solution Code}
+\subsection*{Numerical Solution Code}
 \begin{minted}{python}
 
 def numerical (r_grid, t_max):
@@ -603,19 +856,85 @@ def numerical (r_grid, t_max):
 \end{minted}
 
 
-\subsection{Code1}
-\begin{minted}{xml}
-<institution>
-      <name>NO_ddd</name>
-       <config><NO_ddd/></config>
-      <reactor_list>
-        <val>lwr</val>
-        <val>sfr</val>
-        <val>mox_lwr</val>
-      </reactor_list>
+\subsection*{Analytical Solution Code}
+\begin{minted}{python}
+def analytical (r_grid, t_max, t_grid, n):
+    R = 3
+    k = 0.15
+    rho = 8000. / 1000000.
+    cp = 500
+    alpha = k / (rho*cp)
+    T_0 = 1
+
+    #########################
+    # finding betas
+    points = np.arange(-0.1, 1e3, 1e-4)
+    pot_betas = []
+    for beta in points:
+        if beta_equation(beta) > 0:
+            flag = 0
+        elif beta_equation(beta) < 0 and flag == 0:
+            pot_betas.append(beta)
+            flag = 1
+
+    # pick only first n betas
+    betas = pot_betas[:n]
+    print(betas)
+    ###########################
+
+    T_0 = 1
+    r_list = np.linspace(0, R, r_grid)
+    dr = r_list[1] - r_list[0]
+    t_list = np.linspace(0, t_max, t_grid)
+    dt = t_list[1] - t_list[0]
+
+    t = [0] * r_grid
+    t_compiled_betas = [0] * r_grid
+    t_tot = (T_0 / 2) * (1 - np.cos(np.pi * r_list / R))
+    t_ss = 3*T_0 /2 * ((np.pi**2 + 6)/(3*np.pi**2))
+    print(t_ss)
+    steady_state = [t_ss] * r_grid
+    # plot initial condition
+    plt.plot(r_list, t_tot, label = 't = 0 secs')
+    plt.plot(r_list, steady_state, label = 'Steady State')
+
+    def integrand1(r, b, T_0, R, t_ss):
+        return ((r*T_0*0.5*(1-np.cos(np.pi*r / R)) - t_ss * r)*np.sin(b * r))
+    def integrand2(r, b):
+        return ((np.sin(b*r))**2) 
+
+    print(betas)
+    for time in range(1, len(t_list)):
+        t_compiled_betas = [0] * r_grid
+        for b in betas[1:]:
+            t = [0] * r_grid
+            for space in range(1, len(r_list)):
+                r = r_list[space]
+                integral1 = integrate.quad(integrand1, 0, R, args=(b, T_0, R, t_ss))
+                integral2 = integrate.quad(integrand2, 0, R, args=(b))
+                a = integral1[0] / integral2[0]
+                spatial = np.sin(b*r) / r
+                temporal = np.exp(-1 * b**2 * alpha * t_list[time])
+                t[space] = a * spatial * temporal
+                t[0] = t[1]
+            t_compiled_betas = [x+y for x,y in zip(t_compiled_betas, t)]
+
+        t_compiled_betas = [x+t_ss for x in t_compiled_betas]    
+        plt.plot(r_list, t_compiled_betas, label='t = %s secs' %str(t_list[time])[:5])
+        t_tot = np.vstack((t_tot, t_compiled_betas))
+
+    print(t_tot)
+    plt.ylabel(r'$\frac{Temperature}{T_0}$')
+    plt.xlabel('r [cm]')
+    plt.legend()
+    plt.title('Analytical Solution of Time-evolution of Heat Profile')
+    plt.savefig('Analytical.png', format='png')
+    plt.show()
 \end{minted}
 
+\pagebreak
 
+-end of report.
 \end{document}
 
 

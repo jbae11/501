@@ -1,0 +1,28 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k+kn}{as} \PYG{n+nn}{np}
+
+
+\PYG{k}{def} \PYG{n+nf}{beta\PYGZus{}equation}\PYG{p}{(}\PYG{n}{beta}\PYG{p}{):}
+    \PYG{n}{y} \PYG{o}{=} \PYG{l+m+mi}{3}\PYG{o}{*}\PYG{n}{beta} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{tan}\PYG{p}{(}\PYG{n}{beta} \PYG{o}{*} \PYG{l+m+mi}{3}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{y}
+
+\PYG{n}{R} \PYG{o}{=} \PYG{l+m+mi}{3}
+\PYG{n}{k} \PYG{o}{=} \PYG{l+m+mf}{0.15}
+\PYG{n}{rho} \PYG{o}{=} \PYG{l+m+mf}{8000.} \PYG{o}{/} \PYG{l+m+mf}{1000000.}
+\PYG{n}{cp} \PYG{o}{=} \PYG{l+m+mi}{500}
+\PYG{n}{alpha} \PYG{o}{=} \PYG{n}{k} \PYG{o}{/} \PYG{p}{(}\PYG{n}{rho}\PYG{o}{*}\PYG{n}{cp}\PYG{p}{)}
+\PYG{n}{T\PYGZus{}0} \PYG{o}{=} \PYG{l+m+mi}{1}
+
+\PYG{n}{points} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{arange}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mf}{1e2}\PYG{p}{,} \PYG{l+m+mf}{1e\PYGZhy{}5}\PYG{p}{)}
+\PYG{n}{pot\PYGZus{}betas} \PYG{o}{=} \PYG{p}{[]}
+\PYG{n}{count} \PYG{o}{=} \PYG{l+m+mi}{0}
+\PYG{n}{flag} \PYG{o}{=} \PYG{l+m+mi}{1}
+\PYG{k}{for} \PYG{n}{beta} \PYG{o+ow}{in} \PYG{n}{points}\PYG{p}{:}
+    \PYG{k}{if} \PYG{n}{beta\PYGZus{}equation}\PYG{p}{(}\PYG{n}{beta}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:}
+        \PYG{n}{flag} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{k}{elif} \PYG{n}{beta\PYGZus{}equation}\PYG{p}{(}\PYG{n}{beta}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{0} \PYG{o+ow}{and} \PYG{n}{flag} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{:}
+        \PYG{n}{pot\PYGZus{}betas}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{beta}\PYG{p}{)}
+        \PYG{n}{count} \PYG{o}{=} \PYG{n}{count} \PYG{o}{+} \PYG{l+m+mi}{1}
+        \PYG{n}{flag} \PYG{o}{=} \PYG{l+m+mi}{1}
+\PYG{n}{betas} \PYG{o}{=} \PYG{n}{pot\PYGZus{}betas}
+\end{Verbatim}

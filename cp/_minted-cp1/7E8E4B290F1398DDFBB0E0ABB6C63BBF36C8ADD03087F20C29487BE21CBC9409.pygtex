@@ -1,0 +1,74 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{analytical} \PYG{p}{(}\PYG{n}{r\PYGZus{}grid}\PYG{p}{,} \PYG{n}{t\PYGZus{}max}\PYG{p}{,} \PYG{n}{t\PYGZus{}grid}\PYG{p}{,} \PYG{n}{n}\PYG{p}{):}
+    \PYG{n}{R} \PYG{o}{=} \PYG{l+m+mi}{3}
+    \PYG{n}{k} \PYG{o}{=} \PYG{l+m+mf}{0.15}
+    \PYG{n}{rho} \PYG{o}{=} \PYG{l+m+mf}{8000.} \PYG{o}{/} \PYG{l+m+mf}{1000000.}
+    \PYG{n}{cp} \PYG{o}{=} \PYG{l+m+mi}{500}
+    \PYG{n}{alpha} \PYG{o}{=} \PYG{n}{k} \PYG{o}{/} \PYG{p}{(}\PYG{n}{rho}\PYG{o}{*}\PYG{n}{cp}\PYG{p}{)}
+    \PYG{n}{T\PYGZus{}0} \PYG{o}{=} \PYG{l+m+mi}{1}
+
+    \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+    \PYG{c+c1}{\PYGZsh{} finding betas}
+    \PYG{n}{points} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{arange}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{0.1}\PYG{p}{,} \PYG{l+m+mf}{1e3}\PYG{p}{,} \PYG{l+m+mf}{1e\PYGZhy{}4}\PYG{p}{)}
+    \PYG{n}{pot\PYGZus{}betas} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{k}{for} \PYG{n}{beta} \PYG{o+ow}{in} \PYG{n}{points}\PYG{p}{:}
+        \PYG{k}{if} \PYG{n}{beta\PYGZus{}equation}\PYG{p}{(}\PYG{n}{beta}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{n}{flag} \PYG{o}{=} \PYG{l+m+mi}{0}
+        \PYG{k}{elif} \PYG{n}{beta\PYGZus{}equation}\PYG{p}{(}\PYG{n}{beta}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{0} \PYG{o+ow}{and} \PYG{n}{flag} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{n}{pot\PYGZus{}betas}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{beta}\PYG{p}{)}
+            \PYG{n}{flag} \PYG{o}{=} \PYG{l+m+mi}{1}
+
+    \PYG{c+c1}{\PYGZsh{} pick only first n betas}
+    \PYG{n}{betas} \PYG{o}{=} \PYG{n}{pot\PYGZus{}betas}\PYG{p}{[:}\PYG{n}{n}\PYG{p}{]}
+    \PYG{k}{print}\PYG{p}{(}\PYG{n}{betas}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+
+    \PYG{n}{T\PYGZus{}0} \PYG{o}{=} \PYG{l+m+mi}{1}
+    \PYG{n}{r\PYGZus{}list} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{R}\PYG{p}{,} \PYG{n}{r\PYGZus{}grid}\PYG{p}{)}
+    \PYG{n}{dr} \PYG{o}{=} \PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+    \PYG{n}{t\PYGZus{}list} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{t\PYGZus{}max}\PYG{p}{,} \PYG{n}{t\PYGZus{}grid}\PYG{p}{)}
+    \PYG{n}{dt} \PYG{o}{=} \PYG{n}{t\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{t\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+
+    \PYG{n}{t} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{*} \PYG{n}{r\PYGZus{}grid}
+    \PYG{n}{t\PYGZus{}compiled\PYGZus{}betas} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{*} \PYG{n}{r\PYGZus{}grid}
+    \PYG{n}{t\PYGZus{}tot} \PYG{o}{=} \PYG{p}{(}\PYG{n}{T\PYGZus{}0} \PYG{o}{/} \PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{*} \PYG{p}{(}\PYG{l+m+mi}{1} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{cos}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi} \PYG{o}{*} \PYG{n}{r\PYGZus{}list} \PYG{o}{/} \PYG{n}{R}\PYG{p}{))}
+    \PYG{n}{t\PYGZus{}ss} \PYG{o}{=} \PYG{l+m+mi}{3}\PYG{o}{*}\PYG{n}{T\PYGZus{}0} \PYG{o}{/}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{p}{((}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{o}{**}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{l+m+mi}{6}\PYG{p}{)}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{))}
+    \PYG{k}{print}\PYG{p}{(}\PYG{n}{t\PYGZus{}ss}\PYG{p}{)}
+    \PYG{n}{steady\PYGZus{}state} \PYG{o}{=} \PYG{p}{[}\PYG{n}{t\PYGZus{}ss}\PYG{p}{]} \PYG{o}{*} \PYG{n}{r\PYGZus{}grid}
+    \PYG{c+c1}{\PYGZsh{} plot initial condition}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{t\PYGZus{}tot}\PYG{p}{,} \PYG{n}{label} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}t = 0 secs\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{steady\PYGZus{}state}\PYG{p}{,} \PYG{n}{label} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}Steady State\PYGZsq{}}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{integrand1}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,} \PYG{n}{b}\PYG{p}{,} \PYG{n}{T\PYGZus{}0}\PYG{p}{,} \PYG{n}{R}\PYG{p}{,} \PYG{n}{t\PYGZus{}ss}\PYG{p}{):}
+        \PYG{k}{return} \PYG{p}{((}\PYG{n}{r}\PYG{o}{*}\PYG{n}{T\PYGZus{}0}\PYG{o}{*}\PYG{l+m+mf}{0.5}\PYG{o}{*}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{np}\PYG{o}{.}\PYG{n}{cos}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{o}{*}\PYG{n}{r} \PYG{o}{/} \PYG{n}{R}\PYG{p}{))} \PYG{o}{\PYGZhy{}} \PYG{n}{t\PYGZus{}ss} \PYG{o}{*} \PYG{n}{r}\PYG{p}{)}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{sin}\PYG{p}{(}\PYG{n}{b} \PYG{o}{*} \PYG{n}{r}\PYG{p}{))}
+    \PYG{k}{def} \PYG{n+nf}{integrand2}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,} \PYG{n}{b}\PYG{p}{):}
+        \PYG{k}{return} \PYG{p}{((}\PYG{n}{np}\PYG{o}{.}\PYG{n}{sin}\PYG{p}{(}\PYG{n}{b}\PYG{o}{*}\PYG{n}{r}\PYG{p}{))}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+
+    \PYG{k}{print}\PYG{p}{(}\PYG{n}{betas}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{time} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{t\PYGZus{}list}\PYG{p}{)):}
+        \PYG{n}{t\PYGZus{}compiled\PYGZus{}betas} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{*} \PYG{n}{r\PYGZus{}grid}
+        \PYG{k}{for} \PYG{n}{b} \PYG{o+ow}{in} \PYG{n}{betas}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:]:}
+            \PYG{n}{t} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{*} \PYG{n}{r\PYGZus{}grid}
+            \PYG{k}{for} \PYG{n}{space} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{)):}
+                \PYG{n}{r} \PYG{o}{=} \PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{n}{space}\PYG{p}{]}
+                \PYG{n}{integral1} \PYG{o}{=} \PYG{n}{integrate}\PYG{o}{.}\PYG{n}{quad}\PYG{p}{(}\PYG{n}{integrand1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{R}\PYG{p}{,} \PYG{n}{args}\PYG{o}{=}\PYG{p}{(}\PYG{n}{b}\PYG{p}{,} \PYG{n}{T\PYGZus{}0}\PYG{p}{,} \PYG{n}{R}\PYG{p}{,} \PYG{n}{t\PYGZus{}ss}\PYG{p}{))}
+                \PYG{n}{integral2} \PYG{o}{=} \PYG{n}{integrate}\PYG{o}{.}\PYG{n}{quad}\PYG{p}{(}\PYG{n}{integrand2}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{R}\PYG{p}{,} \PYG{n}{args}\PYG{o}{=}\PYG{p}{(}\PYG{n}{b}\PYG{p}{))}
+                \PYG{n}{a} \PYG{o}{=} \PYG{n}{integral1}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{/} \PYG{n}{integral2}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+                \PYG{n}{spatial} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sin}\PYG{p}{(}\PYG{n}{b}\PYG{o}{*}\PYG{n}{r}\PYG{p}{)} \PYG{o}{/} \PYG{n}{r}
+                \PYG{n}{temporal} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{exp}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1} \PYG{o}{*} \PYG{n}{b}\PYG{o}{**}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{alpha} \PYG{o}{*} \PYG{n}{t\PYGZus{}list}\PYG{p}{[}\PYG{n}{time}\PYG{p}{])}
+                \PYG{n}{t}\PYG{p}{[}\PYG{n}{space}\PYG{p}{]} \PYG{o}{=} \PYG{n}{a} \PYG{o}{*} \PYG{n}{spatial} \PYG{o}{*} \PYG{n}{temporal}
+                \PYG{n}{t}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{=} \PYG{n}{t}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}
+            \PYG{n}{t\PYGZus{}compiled\PYGZus{}betas} \PYG{o}{=} \PYG{p}{[}\PYG{n}{x}\PYG{o}{+}\PYG{n}{y} \PYG{k}{for} \PYG{n}{x}\PYG{p}{,}\PYG{n}{y} \PYG{o+ow}{in} \PYG{n+nb}{zip}\PYG{p}{(}\PYG{n}{t\PYGZus{}compiled\PYGZus{}betas}\PYG{p}{,} \PYG{n}{t}\PYG{p}{)]}
+
+        \PYG{n}{t\PYGZus{}compiled\PYGZus{}betas} \PYG{o}{=} \PYG{p}{[}\PYG{n}{x}\PYG{o}{+}\PYG{n}{t\PYGZus{}ss} \PYG{k}{for} \PYG{n}{x} \PYG{o+ow}{in} \PYG{n}{t\PYGZus{}compiled\PYGZus{}betas}\PYG{p}{]}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{t\PYGZus{}compiled\PYGZus{}betas}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}t = }\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{ secs\PYGZsq{}} \PYG{o}{\PYGZpc{}}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{t\PYGZus{}list}\PYG{p}{[}\PYG{n}{time}\PYG{p}{])[:}\PYG{l+m+mi}{5}\PYG{p}{])}
+        \PYG{n}{t\PYGZus{}tot} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{vstack}\PYG{p}{((}\PYG{n}{t\PYGZus{}tot}\PYG{p}{,} \PYG{n}{t\PYGZus{}compiled\PYGZus{}betas}\PYG{p}{))}
+
+    \PYG{k}{print}\PYG{p}{(}\PYG{n}{t\PYGZus{}tot}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+sa}{r}\PYG{l+s+s1}{\PYGZsq{}\PYGZdl{}\PYGZbs{}frac\PYGZob{}Temperature\PYGZcb{}\PYGZob{}T\PYGZus{}0\PYGZcb{}\PYGZdl{}\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}r [cm]\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Analytical Solution of Time\PYGZhy{}evolution of Heat Profile\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Analytical.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}png\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+\end{Verbatim}
