@@ -104,11 +104,117 @@ Initial Condition:
 \[T(r,0) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) \]
 
 
-\subsection{Finding Steady State}
+\section{Analytical Term Study}
+For the term study, it is speculated that for higher time values,
+less terms ($\beta_n$) would be needed for reasonable convergence,
+since a higher time value would cause the exponential term, which has
+$\beta$ in, less of a contribution.
+
+\[\overline{T}(r,t) = \sum_{n=1}^{\infty} A_n e^{-\alpha \beta_n^2 t} sin(\beta_n r)\]
+
+The study is conducted where different number of betas are used for each timestep.
+Six timesteps are used: $t = 0, 4, 17.7, 31.1, 62.2, 75$.
+A 'reasonable convergence' is met when $$ \sum_{r=0}^{R} (|r_{r}^n - r_{r}^{n+1}|) < 1e-3$$
+Where n is the number of terms used for the temperature profile.
+
+\Cref{tab:conv} organizes the `reasonable convergence` point of all timesteps.
+
+\begin{table}[h]
+     \centering
+    \begin{tabular}{cc}
+       \hline
+       \textbf{Time [secs]} & \textbf{Number of Terms for Convergence}  \\
+       \hline
+       0 & 17 \\
+       4 & 5 \\
+       17.7 & 3 \\
+       31.1 & 2 \\
+       62.2 & 2 \\
+       75 & 2 \\
+       \hline
+    \end{tabular}
+    \caption {Timestep and number of terms for convergence.}
+    \label{tab:conv}
+\end{table}
+
+
+As expected, as time increases, the number of terms for convergence
+becomes minimal. 
+\Cref{fig:0}, \ref{fig:4}, \ref{fig:17}, \ref{fig:31}, \ref{fig:62}, \ref{fig:75} show the 
+convergence study where the temperature profile is plotted with
+increasing number of terms. Note the visible difference is negligible.
+Also note the y axis range change for different times.
+
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{terms_0.png}
+  \end{center}
+  \caption{Number of terms convergence study for t = 0.}
+  \label{fig:0}
+\end{figure}
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{terms_4.png}
+  \end{center}
+  \caption{Number of terms convergence study for t = 4.}
+  \label{fig:4}
+\end{figure}
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{terms_177.png}
+  \end{center}
+  \caption{Number of terms convergence study for t = 17.7.}
+  \label{fig:17}
+\end{figure}
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{terms_311.png}
+  \end{center}
+  \caption{Number of terms convergence study for t = 31.1.}
+  \label{fig:31}
+\end{figure}
+
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{terms_622.png}
+  \end{center}
+  \caption{Number of terms convergence study for t = 62.2.}
+  \label{fig:62}
+\end{figure}
+
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{terms_75.png}
+  \end{center}
+  \caption{Number of terms convergence study for t = 75.}
+  \label{fig:75}
+\end{figure}
+
+
+\pagebreak
+
+\section{Appendix A}
+
+\subsection{Simple Energy Balance}
 Since there is no heat generation or leakage (r=R is insulated), 
 the steady state temperature is a constant throughout the sphere.
 
-Expressing mathematically,
+Doing a simple energy balance,
+
+\[\frac{dE}{dt} = E_{gain} - E_{loss}\]
+
+\[\frac{dE}{dt} = E_{gen} + E_{in} - E_{out}\]
+
+Since there is no heat generation, flux in, or flux out (insulated BC),
+the steady state is a constant temperature in time.
+
+
+Expressing mathematically for when time goes to infinity:
 
 $T_{ss}$ is when $\frac{dT}{dt} = 0 $:
 
@@ -125,7 +231,7 @@ at r = 0, finite, makes  $C_1 = 0$
 \[T_{ss} = C_2\]
 
 the numerical value of this constant can be found doing an energy balance
-of the system.
+of the system with the initial condition:
 
 \[\int_{0}^{R} \frac{T_0}{2} (1-\cos(\frac{\pi r}{R})) r^2 dr = \int_{0}^{R} C r^2 dr \]
 
@@ -144,55 +250,42 @@ Solving this:
     C = T_{ss} = \frac{3T_0}{2} (\frac{\pi^2 + 6}{3\pi^2}) \approx 0.804 T_0
 }
 
+The steady state is plotted in figure \cref{fig:ss}.
 
-\section{Numerical Solution}
-
-
-\[\frac{1}{\alpha} \cdot \frac{dT}{dt} = \frac{2}{r} \frac{dT}{dr} + \frac{d^2T}{dr^2}\]
-
-Applying the finite difference method, central for r and explicit for t:
-\[\frac{1}{\alpha} \cdot \frac{T_k^{u} - T_k^{u-1}}{\Delta t} = \frac{2}{r_k} \; (\frac{T^{u-1}_{k+1}-T^{u-1}_{k-1}}{2 \Delta r}) + \frac{T^{u-1}_{k-1} - 2T^{u-1}_k + T^{u-1}_{k+1}}{\Delta r^2}\]
-
-where u is the temporal step and k is the spacial step.
-
-Solving for $T_{k}^{u+1}$:
-
-\centering{
-    \mathcolorbox{yellow}{
-    T_{k}^{u+1} = T_k^u + \alpha \frac{\Delta t }{\Delta r \cdot r} (T_{k+1}^u + T_{k-1}^u) + \alpha * \frac{\Delta t}{(\Delta r)^2} (T_{k+1}^{u} -2T_k^u + T_{k-1}^u) }
-}
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[scale=0.7]{steady_state.png}
+  \end{center}
+  \caption{Plot of Steady State Solution for the Sphere.}
+  \label{fig:ss}
+\end{figure}
 
 
-Applying neuman boundary condition at r=0:
-\[\frac{dT(0,t)}{dr} =0 \]
-\[\frac{T_1^u - T_{-1}^u}{2\Delta r} =0 \]
-\[T_1^u = T_{-1}^u\]
+\section{Sketch of Different Temperature Profiles in Time}
+The time evolution of the temperature profile starts from t=0,
+with the two boundary points, $T(0,0) = 0$ and $T(R,0) = T_0$.
+Through time, the temperature profile flattens out, since the 
+only thing affecting the profile is heat diffusion. The steady
+state (as time goes to infinity) becomes a constant throughout space.
+A sketch is made in \Cref{fig:sketch}.
 
-This gives:
+\begin{figure}[htbp!]
+  \begin{center}
+    \includegraphics[width=0.6\textwidth ]{s.jpg}
+  \end{center}
+  \caption{Sketch of Temperature profile over time.}
+  \label{fig:sketch}
+\end{figure}
 
-\centering{
-    \mathcolorbox{yellow}{T_0^{u+1} = T_0^u + \alpha * \frac{\Delta t}{(\Delta r)^2} (2T_{1}^{u} -2T_0^u ) }
-}
 
+\section{Solution of $T(r,t)$ for $t > 0$}
+Since the numerical value of $T_{ss}$ has been found
+through the energy balance, that can be added to the solution
+for $T(r,t)$ for $t>0$.
 
-Applying neuman boundary condition at r=R (k=K at r=R):
-\[-k \frac{dT(R,t)}{dr} =0 \]
-\[\frac{T_{K+1}^u - T_{K-1}^u}{2\Delta r} =0 \]
-\[T_{K+1}^u = T_{K-1}^u\]
+The application and solution for $T(r,t)$ is shown in Appendix B.
 
-This gives:
-
-\centering{
-    \mathcolorbox{yellow}{T_K^{u+1} = T_K^u + \alpha * \frac{\Delta t}{(\Delta r)^2} (2T_{K-1}^{u} -2T_K^u )}
-}
-
-\section{Appendix A}
-
-\subsection{a. Final Temperature Distribution in the Sphere}
-The final temperature distribution will be a cosine curve
-with the highest point at r = 0, gradually going down to
-the minimum value at r = R. 
-
+\pagebreak
 \section{Appendix B}
 
 \subsection{Analytical solution for solving T(r,t) directly}
@@ -336,7 +429,7 @@ Considering $\frac{dT_{ss}}{dt} = \frac{dT_{ss}}{dr} = 0$,
 
 \[\frac{1}{\alpha} \cdot \frac{dT'}{dt} = \frac{1}{r^2} \frac{d}{dr} r^2 \cdot \frac{dT'}{dr} \]
 
-Boundary Conditions:
+Boundary Conditions
 \[T'(0,t)  = finite \]
 \[\frac{dT'}{dr} (r = R) = 0 \]
 
@@ -411,6 +504,103 @@ The analytical solution is:
 Since the solution from section 4.1 with $n=0$ covers the 
 steady state case, this problem is redundant and provides
 no new insight into the problem from section 4.1.
+
+
+
+\section{Appendix C - Numerical Solution}
+
+
+\[\frac{1}{\alpha} \cdot \frac{dT}{dt} = \frac{2}{r} \frac{dT}{dr} + \frac{d^2T}{dr^2}\]
+
+Applying the finite difference method, central for r and explicit for t:
+\[\frac{1}{\alpha} \cdot \frac{T_k^{u} - T_k^{u-1}}{\Delta t} = \frac{2}{r_k} \; (\frac{T^{u-1}_{k+1}-T^{u-1}_{k-1}}{2 \Delta r}) + \frac{T^{u-1}_{k-1} - 2T^{u-1}_k + T^{u-1}_{k+1}}{\Delta r^2}\]
+
+where u is the temporal step and k is the spacial step.
+
+Solving for $T_{k}^{u+1}$:
+
+\centering{
+    \mathcolorbox{yellow}{
+    T_{k}^{u+1} = T_k^u + \alpha \frac{\Delta t }{\Delta r \cdot r} (T_{k+1}^u + T_{k-1}^u) + \alpha * \frac{\Delta t}{(\Delta r)^2} (T_{k+1}^{u} -2T_k^u + T_{k-1}^u) }
+}
+
+
+Applying neuman boundary condition at r=0:
+\[\frac{dT(0,t)}{dr} =0 \]
+\[\frac{T_1^u - T_{-1}^u}{2\Delta r} =0 \]
+\[T_1^u = T_{-1}^u\]
+
+This gives:
+
+\centering{
+    \mathcolorbox{yellow}{T_0^{u+1} = T_0^u + \alpha * \frac{\Delta t}{(\Delta r)^2} (2T_{1}^{u} -2T_0^u ) }
+}
+
+
+Applying neuman boundary condition at r=R (k=K at r=R):
+\[-k \frac{dT(R,t)}{dr} =0 \]
+\[\frac{T_{K+1}^u - T_{K-1}^u}{2\Delta r} =0 \]
+\[T_{K+1}^u = T_{K-1}^u\]
+
+This gives:
+
+\centering{
+    \mathcolorbox{yellow}{T_K^{u+1} = T_K^u + \alpha * \frac{\Delta t}{(\Delta r)^2} (2T_{K-1}^{u} -2T_K^u )}
+}
+
+
+\subsection{Numerical Solution Code}
+\begin{minted}{python}
+
+def numerical (r_grid, t_max):
+    # GRID AND STUFF 
+    R = 3
+    k = 0.15
+    rho = 8000. / 1000000.
+    cp = 500
+    alpha = k / (rho*cp)
+    T_0 = 1
+
+    t_grid = 1000
+
+    r_list = np.linspace(0, R, r_grid) 
+    dr = r_list[1] - r_list[0]
+    t_list = np.linspace(0, t_max, t_grid)
+    dt = t_list[1] - t_list[0]
+
+    if dt/dr > 1e8:
+        raise ValueError('Too high of dt/dr dude')  
+
+    t = np.zeros((len(r_list), len(t_list)), dtype=float)
+
+    # Apply Initial Condition
+    t[:,0] = (T_0 / 2) * (1 - np.cos(np.pi * r_list / R))
+    print(t[:,0])
+
+    x = dt/dr
+    
+    plt.plot(r_list, t[:,0], label='t = 0 secs')
+
+    for timestep in range(1, len(t_list)):
+        t[0,timestep] = t[0,timestep-1] + (alpha * (x/dr) * (2*t[1,timestep-1] - 2*t[0,timestep-1]))
+        t[-1,timestep] = t[-1, timestep-1] + alpha * (x/dr) * (2*t[-2,timestep-1] - 2*t[-1,timestep-1])
+        for space in range(1, len(r_list)-1):
+            first_term = alpha * (x/r_list[space]) * (t[space+1,timestep-1] - t[space-1, timestep-1])
+            second_term = alpha * (x/dr) * (t[space+1, timestep-1] - (2*t[space, timestep-1]) + t[space-1, timestep-1])
+            t[space, timestep] = t[space, timestep-1] + first_term + second_term
+
+        if timestep%100 ==0:
+            plt.plot(r_list, t[:,timestep], label='t = %s secs' %str(t_list[timestep])[:5])
+
+    print(t)
+    plt.ylabel(r'$\frac{Temperature}{T_0}$')
+    plt.xlabel('r [cm]')
+    plt.legend()
+    plt.title('Numerical Solution of Time-evolution of Heat Profile')
+    plt.savefig('Numerical.png', format='png')
+    plt.show()
+
+\end{minted}
 
 
 \subsection{Code1}

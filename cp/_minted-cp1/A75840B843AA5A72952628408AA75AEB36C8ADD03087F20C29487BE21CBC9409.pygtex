@@ -1,0 +1,49 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{numerical} \PYG{p}{(}\PYG{n}{r\PYGZus{}grid}\PYG{p}{,} \PYG{n}{t\PYGZus{}max}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} GRID AND STUFF}
+    \PYG{n}{R} \PYG{o}{=} \PYG{l+m+mi}{3}
+    \PYG{n}{k} \PYG{o}{=} \PYG{l+m+mf}{0.15}
+    \PYG{n}{rho} \PYG{o}{=} \PYG{l+m+mf}{8000.} \PYG{o}{/} \PYG{l+m+mf}{1000000.}
+    \PYG{n}{cp} \PYG{o}{=} \PYG{l+m+mi}{500}
+    \PYG{n}{alpha} \PYG{o}{=} \PYG{n}{k} \PYG{o}{/} \PYG{p}{(}\PYG{n}{rho}\PYG{o}{*}\PYG{n}{cp}\PYG{p}{)}
+    \PYG{n}{T\PYGZus{}0} \PYG{o}{=} \PYG{l+m+mi}{1}
+
+    \PYG{n}{t\PYGZus{}grid} \PYG{o}{=} \PYG{l+m+mi}{1000}
+
+    \PYG{n}{r\PYGZus{}list} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{R}\PYG{p}{,} \PYG{n}{r\PYGZus{}grid}\PYG{p}{)}
+    \PYG{n}{dr} \PYG{o}{=} \PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+    \PYG{n}{t\PYGZus{}list} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{t\PYGZus{}max}\PYG{p}{,} \PYG{n}{t\PYGZus{}grid}\PYG{p}{)}
+    \PYG{n}{dt} \PYG{o}{=} \PYG{n}{t\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{t\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+
+    \PYG{k}{if} \PYG{n}{dt}\PYG{o}{/}\PYG{n}{dr} \PYG{o}{\PYGZgt{}} \PYG{l+m+mf}{1e8}\PYG{p}{:}
+        \PYG{k}{raise} \PYG{n+ne}{ValueError}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Too high of dt/dr dude\PYGZsq{}}\PYG{p}{)}
+
+    \PYG{n}{t} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{((}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{),} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{t\PYGZus{}list}\PYG{p}{)),} \PYG{n}{dtype}\PYG{o}{=}\PYG{n+nb}{float}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Apply Initial Condition}
+    \PYG{n}{t}\PYG{p}{[:,}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{=} \PYG{p}{(}\PYG{n}{T\PYGZus{}0} \PYG{o}{/} \PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{*} \PYG{p}{(}\PYG{l+m+mi}{1} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{cos}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi} \PYG{o}{*} \PYG{n}{r\PYGZus{}list} \PYG{o}{/} \PYG{n}{R}\PYG{p}{))}
+    \PYG{k}{print}\PYG{p}{(}\PYG{n}{t}\PYG{p}{[:,}\PYG{l+m+mi}{0}\PYG{p}{])}
+
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{dt}\PYG{o}{/}\PYG{n}{dr}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{t}\PYG{p}{[:,}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}t = 0 secs\PYGZsq{}}\PYG{p}{)}
+
+    \PYG{k}{for} \PYG{n}{timestep} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{t\PYGZus{}list}\PYG{p}{)):}
+        \PYG{n}{t}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{timestep}\PYG{p}{]} \PYG{o}{=} \PYG{n}{t}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{+} \PYG{p}{(}\PYG{n}{alpha} \PYG{o}{*} \PYG{p}{(}\PYG{n}{x}\PYG{o}{/}\PYG{n}{dr}\PYG{p}{)} \PYG{o}{*} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{t}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{t}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]))}
+        \PYG{n}{t}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n}{timestep}\PYG{p}{]} \PYG{o}{=} \PYG{n}{t}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{+} \PYG{n}{alpha} \PYG{o}{*} \PYG{p}{(}\PYG{n}{x}\PYG{o}{/}\PYG{n}{dr}\PYG{p}{)} \PYG{o}{*} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{t}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{2}\PYG{p}{,}\PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{t}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])}
+        \PYG{k}{for} \PYG{n}{space} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{):}
+            \PYG{n}{first\PYGZus{}term} \PYG{o}{=} \PYG{n}{alpha} \PYG{o}{*} \PYG{p}{(}\PYG{n}{x}\PYG{o}{/}\PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{n}{space}\PYG{p}{])} \PYG{o}{*} \PYG{p}{(}\PYG{n}{t}\PYG{p}{[}\PYG{n}{space}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{t}\PYG{p}{[}\PYG{n}{space}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])}
+            \PYG{n}{second\PYGZus{}term} \PYG{o}{=} \PYG{n}{alpha} \PYG{o}{*} \PYG{p}{(}\PYG{n}{x}\PYG{o}{/}\PYG{n}{dr}\PYG{p}{)} \PYG{o}{*} \PYG{p}{(}\PYG{n}{t}\PYG{p}{[}\PYG{n}{space}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{t}\PYG{p}{[}\PYG{n}{space}\PYG{p}{,} \PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o}{+} \PYG{n}{t}\PYG{p}{[}\PYG{n}{space}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])}
+            \PYG{n}{t}\PYG{p}{[}\PYG{n}{space}\PYG{p}{,} \PYG{n}{timestep}\PYG{p}{]} \PYG{o}{=} \PYG{n}{t}\PYG{p}{[}\PYG{n}{space}\PYG{p}{,} \PYG{n}{timestep}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{+} \PYG{n}{first\PYGZus{}term} \PYG{o}{+} \PYG{n}{second\PYGZus{}term}
+
+        \PYG{k}{if} \PYG{n}{timestep}\PYG{o}{\PYGZpc{}}\PYG{l+m+mi}{100} \PYG{o}{==}\PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{t}\PYG{p}{[:,}\PYG{n}{timestep}\PYG{p}{],} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}t = }\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{ secs\PYGZsq{}} \PYG{o}{\PYGZpc{}}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{t\PYGZus{}list}\PYG{p}{[}\PYG{n}{timestep}\PYG{p}{])[:}\PYG{l+m+mi}{5}\PYG{p}{])}
+
+    \PYG{k}{print}\PYG{p}{(}\PYG{n}{t}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+sa}{r}\PYG{l+s+s1}{\PYGZsq{}\PYGZdl{}\PYGZbs{}frac\PYGZob{}Temperature\PYGZcb{}\PYGZob{}T\PYGZus{}0\PYGZcb{}\PYGZdl{}\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}r [cm]\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Numerical Solution of Time\PYGZhy{}evolution of Heat Profile\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Numerical.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}png\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+\end{Verbatim}
