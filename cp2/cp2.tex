@@ -1,0 +1,173 @@
+\documentclass[12pt,letterpaper]{article}
+
+%Note to Self:
+%When Decommission? - after two months of feeling useless or right away?
+
+\usepackage[utf8]{inputenc}
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage{caption} % for table captions
+
+\usepackage{amsmath} % for multi-line equations and piecewises
+\usepackage{indentfirst} % to indent after a section
+\usepackage{setspace}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xspace}
+\usepackage{verbatim} % for block comments
+\usepackage{subfig} % for subfigures
+\usepackage{enumitem} % for a) b) c) lists
+\usepackage{tabularx}
+\usepackage{cleveref}
+\usepackage{xcolor}
+\usepackage{soul}
+\newcommand{\mathcolorbox}[2]{\colorbox{#1}{$\displaystyle #2$}}
+
+\newcolumntype{b}{X}
+\newcolumntype{s}{>{\hsize=.5\hsize}X}
+\newcolumntype{m}{>{\hsize=.75\hsize}X}
+\usepackage{titling}
+\usepackage{minted}
+
+\newcommand{\subtitle}[1]{%
+  \posttitle{%
+    \par\end{center}
+    \begin{center}\large#1\end{center}
+    \vskip0.5em}%
+}
+\usepackage{tikz}
+
+
+\usetikzlibrary{shapes.geometric,arrows}
+\tikzstyle{process} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=blue!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+
+\graphicspath{{images/}}
+ 
+\usepackage[font={footnotesize,it}]{caption}
+ 
+
+
+
+\setlength{\parindent}{15pt} % Default is 15pt.
+
+
+
+
+\fontfamily{ptm}\selectfont
+
+\title{CP2 for NPRE 501}
+\author{Jin Whan Bae}
+\date{2017-12-01}
+
+
+\begin{document}
+	
+	\maketitle
+	\hrule
+	\onehalfspacing
+	\thispagestyle{empty}
+
+\section*{Problem Definition}
+
+\Cref{tab:constants} lists the constants used in the problem.
+
+
+\begin{table}[h]
+     \centering
+    \begin{tabular}{ccc}
+       \hline
+       Parameter & Value & [Unit] \\
+       \hline
+       \multicolumn{3}{c}{Thermal Hydraulic Data}\\
+       \hline
+       Inlet Temperature & 563 & K \\
+       Outlet Temperature & 598 & K \\
+       Inlet Velocity & 350 & cm/s \\
+       System Pressure at Exit & 2200 & psi \\
+       \hline
+       \multicolumn{3}{c}{Assembly Data} \\
+       \hline
+       Clad Thickness & 0.0572 & cm \\
+       Fuel-Pellet Diameter & 0.819 & cm \\
+       Fuel Element Pitch & 1.25 & cm \\
+       Fuel Element Outer Diameter & 0.94& cm \\
+       Pellet-Clad Gap & 0.0082 & cm \\
+       \textbf{Outer Radius} & 0.625 & cm \\
+       \textbf{Total Fuel Radius} & 0.47 & cm \\
+       \hline
+       \multicolumn{3}{c}{Assumed Constants} \\
+       \hline
+       Water Density & 1 & $\frac{g}{cm^3}$ \\
+       Specific Heat & 4187 & $\frac{J}{kg\cdot K}$ \\
+       Thermal Conductivity & 0.591 & $\frac{J}{s\cdot m\cdot k}$ \\       
+       \hline
+    \end{tabular}
+    \caption {Problem Constants.}
+    \label{tab:constants}
+\end{table}
+
+From the constants, we can derive
+\begin{table}[h]
+     \centering
+    \begin{tabular}{cccc}
+       Derived Constant & Equation & Value & Unit \\
+       Mass Flow & $ v * \rho * A $ & 186.62 & $\frac{g}{s}$ \\
+
+    \end{tabular}
+    \caption {Problem Constants.}
+    \label{tab:constants}
+\end{table}
+
+
+
+\section* {1. Finding Heat Generation Rate}
+
+The heat generation rate, given the inlet and outlet temperature
+at steady-state conditions, can be found using this equation:
+
+\[\int^{V} \frac{q'''(z)}{k} dV = C_p \dot{m} (T_{out} - T_{in})\]
+\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{L}_{0} \frac{q'''(z)}{k} dz d\theta dr= C_p \dot{m} (35)\]
+
+a) Using a constant, average $C_p$ at 307.5C:
+\[C_p = 5650 \frac{J}{kg K}\]
+\[\int^{0.47}_{0} \frac{q'''(z)}{k} L 2\pi dr= 5650 * 186.62 * 35\]
+
+Considering $q'''(0) \neq 0$,
+
+\[q'''(z) = C cos(az)\]
+
+
+
+
+
+Differential Equation:
+
+For water channel ($R_i < r < R_o$):
+\[\frac{1}{\alpha} \cdot (\frac{dT}{dt} + (V_r \frac{dT}{dr} + V_z \frac{dT}{dz})) =
+  \frac{1}{dr} \frac{d}{dr} (r \frac{dT}{dr}) + \frac{d^2T}{dz^2})\]
+
+For fuel pin ($r < R_i$):
+\[\frac{1}{\alpha} \cdot (\frac{dT}{dt}) =
+  \frac{1}{dr} \frac{d}{dr} (r \frac{dT}{dr}) + \frac{d^2T}{dz^2}) + \frac{q(z)}{k}\]
+
+Boundary Conditions:
+\[-k \frac{dT}{dr}(z=R_o) = 0 \]
+\[\frac{dT}{dr}(r=0) = 0\]
+\[-k \frac{dT}{dz}(z=0) = -k \frac{dT}{dz}(z=L) = 0 \]
+ 
+
+Initial Condition:
+\[T(r,0) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) \]
+
+\pagebreak
+
+-end of report.
+\end{document}
+
+
+
+
+
+
