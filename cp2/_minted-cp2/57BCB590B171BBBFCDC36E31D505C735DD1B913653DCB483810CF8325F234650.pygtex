@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYGdefault{k}{def} \PYGdefault{n+nf}{fit\PYGdefaultZus{}poly\PYGdefaultZus{}cp}\PYGdefault{p}{(}\PYGdefault{n}{order}\PYGdefault{p}{):}
+    \PYGdefault{l+s+sd}{\PYGdefaultZdq{}\PYGdefaultZdq{}\PYGdefaultZdq{} fits a polynomial for Temp and C\PYGdefaultZus{}p of Water\PYGdefaultZdq{}\PYGdefaultZdq{}\PYGdefaultZdq{}}
+    \PYGdefault{n}{t} \PYGdefault{o}{=} \PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{array}\PYGdefault{p}{([} \PYGdefault{l+m+mi}{280}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{300}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{320}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{340} \PYGdefault{p}{])}
+    \PYGdefault{n}{c\PYGdefaultZus{}p} \PYGdefault{o}{=} \PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{array}\PYGdefault{p}{([} \PYGdefault{l+m+mi}{5280}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{5750}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{6540}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{8240}\PYGdefault{p}{])}
+    \PYGdefault{n}{eq} \PYGdefault{o}{=} \PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{polyfit}\PYGdefault{p}{(}\PYGdefault{n}{t}\PYGdefault{p}{,} \PYGdefault{n}{c\PYGdefaultZus{}p}\PYGdefault{p}{,} \PYGdefault{n}{order}\PYGdefault{p}{)}
+    \PYGdefault{k}{print}\PYGdefault{p}{(}\PYGdefault{n}{eq}\PYGdefault{p}{)}
+    \PYGdefault{n}{string} \PYGdefault{o}{=} \PYGdefault{l+s+s1}{\PYGdefaultZsq{}\PYGdefaultZsq{}}
+    \PYGdefault{n}{exponent} \PYGdefault{o}{=} \PYGdefault{n}{order}
+    \PYGdefault{k}{for} \PYGdefault{n}{i} \PYGdefault{o+ow}{in} \PYGdefault{n+nb}{range}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{0}\PYGdefault{p}{,}\PYGdefault{n}{order}\PYGdefault{p}{):}
+        \PYGdefault{k}{if} \PYGdefault{n}{eq}\PYGdefault{p}{[}\PYGdefault{n}{i}\PYGdefault{p}{]} \PYGdefault{o}{\PYGdefaultZgt{}} \PYGdefault{l+m+mi}{0}\PYGdefault{p}{:}
+            \PYGdefault{n}{string} \PYGdefault{o}{=} \PYGdefault{n}{string} \PYGdefault{o}{+} \PYGdefault{l+s+s1}{\PYGdefaultZsq{}+\PYGdefaultZsq{}} \PYGdefault{o}{+} \PYGdefault{n+nb}{str}\PYGdefault{p}{(}\PYGdefault{n}{eq}\PYGdefault{p}{[}\PYGdefault{n}{i}\PYGdefault{p}{])} \PYGdefault{o}{+} \PYGdefault{l+s+s1}{\PYGdefaultZsq{}t\PYGdefaultZca{}\PYGdefaultZsq{}} \PYGdefault{o}{+} \PYGdefault{n+nb}{str}\PYGdefault{p}{(}\PYGdefault{n}{exponent}\PYGdefault{p}{)} \PYGdefault{o}{+} \PYGdefault{l+s+s1}{\PYGdefaultZsq{}   \PYGdefaultZsq{}}
+        \PYGdefault{k}{else}\PYGdefault{p}{:}
+            \PYGdefault{n}{string} \PYGdefault{o}{=} \PYGdefault{n}{string} \PYGdefault{o}{+} \PYGdefault{n+nb}{str}\PYGdefault{p}{(}\PYGdefault{n}{eq}\PYGdefault{p}{[}\PYGdefault{n}{i}\PYGdefault{p}{])} \PYGdefault{o}{+} \PYGdefault{l+s+s1}{\PYGdefaultZsq{}t\PYGdefaultZca{}\PYGdefaultZsq{}} \PYGdefault{o}{+} \PYGdefault{n+nb}{str}\PYGdefault{p}{(}\PYGdefault{n}{exponent}\PYGdefault{p}{)} \PYGdefault{o}{+} \PYGdefault{l+s+s1}{\PYGdefaultZsq{}   \PYGdefaultZsq{}}
+
+        \PYGdefault{n}{exponent} \PYGdefault{o}{=} \PYGdefault{n}{exponent}\PYGdefault{o}{\PYGdefaultZhy{}}\PYGdefault{l+m+mi}{1}
+    \PYGdefault{k}{print}\PYGdefault{p}{(}\PYGdefault{n}{string}\PYGdefault{p}{)}
+\end{Verbatim}

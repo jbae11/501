@@ -101,7 +101,7 @@
        \multicolumn{3}{c}{Assumed Constants - Avg at 580K} \\
        \hline
        Water Density & 0.6982 & $\frac{g}{cm^3}$ \\
-       Specific Heat & 5650 & $\frac{J}{kg\cdot K}$ \\
+       Specific Heat & 5.650 & $\frac{J}{g\cdot K}$ \\
        Thermal Conductivity & 0.591 & $\frac{J}{s\cdot m\cdot k}$ \\       
        \hline
     \end{tabular}
@@ -158,14 +158,40 @@ and plugged into a python script to get the polynomial fit
 (code in Appendix).
 
 First, fitting a fifth-order polynomial we get:
-\[C_p = 7.76e-8 T^5 -3.14e-5 T^4 -0.0066 T^3 +1.69 T^2 +1049T^1 -216055\]
+\[C_p = 1.566e-9 T^5 -4.43e-6 T^4 +0.005 T^3 -2.84 T^2 + 807.8 -91697\]
 
 Considering the first three terms are minute, we reduce the 
 number of orders for the polynomial fit. Fitting a third-order and 
 second-order polynomial fit we get:
 
-\[C_p = 0.0281T^3 - 25.58T^2 + 7766 T - 781716 \]
-\[C_p = 0.7245T^2 - 403.24 T + 61525 \]
+\[C_p = 7.83e-6 T^3 - 1.312e-2 T^2 + 7.34 T - 1368 \]
+\[C_p = 4.67e-4 T^2 - 0.510 T + 144 \]
+
+
+
+\section*{Coolant Temperature Profile}
+With the heat generation found, and the axial heat
+conduction in the fuel rod neglected, we get two differential
+equations for the heat conduction in the system.
+Since steady state, $\frac{dT}{dt} = 0 $
+
+One for the fuel region (0 < r< 0.47 cm)
+\[\frac{1}{r} \frac{dT}{dr} (r \frac{dT}{dr}) = -\frac{q'''}{k}\]
+
+And another for the coolant region (0.47 < r <0.625 cm)
+\[-\frac{d^2T}{dz^2} = 0\]
+
+
+Integrating twice, we get, for the fuel temperature,
+\[T_f(r,z) = -\frac{q'''(z)}{k} \frac{r^2}{4} + C_1 ln(r) +C_2\]
+
+For the coolant temperature, integrating it twice gives:
+\[T_c(z) = C_1z + C_2 \]
+
+with BC:
+\[T_f(0,z) = finite\]
+\[T_f(.47,z) = T_c(.47,z)\]
+
 
 \pagebreak
 Differential Equation:
@@ -186,6 +212,8 @@ Boundary Conditions:
 
 Initial Condition:
 \[T(r,0) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) \]
+
+
 
 
 \begin{appendices}

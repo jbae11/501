@@ -10,8 +10,7 @@ def fit_poly_cp(order):
     temp = np.linspace(290+273, 320+273, 100)
     cp =[]
     for i in temp:
-        sat_liq = IAPWS97(T=i, x=0)
-        cp.append(sat_liq.cp)
+        cp.append(IAPWS97(T=i, P=15.17).cp)
     eq = np.polyfit(temp, cp, order)
     print(eq)
     string = ''
@@ -484,7 +483,12 @@ def hagridd (t_grid, t_max=70):
 #anal_n_diff (100, 2, 15)
 #gimme_a_t(100,[0, 2, 4, 17.7, 31.1, 62.2, 75])
 
+
+fit_poly_cp(4)
+
 fit_poly_cp(3)
+
+fit_poly_cp(2)
 
 """
 for t_grid in [ 300, 500]:
