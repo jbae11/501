@@ -3,12 +3,16 @@ import matplotlib.pyplot as plt
 import scipy.integrate as integrate
 import scipy.special as special
 import scipy.optimize
+from iapws import IAPWS97
 
 def fit_poly_cp(order):
     """ fits a polynomial for Temp and C_p of Water"""
-    t = np.array([ 280, 290, 320, 340 ])
-    c_p = np.array([ 5280, 5750, 6540, 8240])
-    eq = np.polyfit(t, c_p, order)
+    temp = np.linspace(290+273, 320+273, 100)
+    cp =[]
+    for i in temp:
+        sat_liq = IAPWS97(T=i, x=0)
+        cp.append(sat_liq.cp)
+    eq = np.polyfit(temp, cp, order)
     print(eq)
     string = ''
     exponent = order
