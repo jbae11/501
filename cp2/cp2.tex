@@ -47,7 +47,7 @@
  
 \usepackage[font={footnotesize,it}]{caption}
  
-
+\usepackage[toc,page]{appendix}
 
 
 \setlength{\parindent}{15pt} % Default is 15pt.
@@ -96,11 +96,12 @@
        Pellet-Clad Gap & 0.0082 & cm \\
        \textbf{Outer Radius} & 0.625 & cm \\
        \textbf{Total Fuel Radius} & 0.47 & cm \\
+       \textbf{Active Core Height} & 366 & cm \\
        \hline
-       \multicolumn{3}{c}{Assumed Constants} \\
+       \multicolumn{3}{c}{Assumed Constants - Avg at 580K} \\
        \hline
-       Water Density & 1 & $\frac{g}{cm^3}$ \\
-       Specific Heat & 4187 & $\frac{J}{kg\cdot K}$ \\
+       Water Density & 0.6982 & $\frac{g}{cm^3}$ \\
+       Specific Heat & 5650 & $\frac{J}{kg\cdot K}$ \\
        Thermal Conductivity & 0.591 & $\frac{J}{s\cdot m\cdot k}$ \\       
        \hline
     \end{tabular}
@@ -112,12 +113,14 @@ From the constants, we can derive
 \begin{table}[h]
      \centering
     \begin{tabular}{cccc}
+    \hline
        Derived Constant & Equation & Value & Unit \\
-       Mass Flow & $ v * \rho * A $ & 186.62 & $\frac{g}{s}$ \\
-
+    \hline
+       Mass Flow & $ v * \rho * A $ & 130.29 & $\frac{g}{s}$ \\
+    \hline
     \end{tabular}
-    \caption {Problem Constants.}
-    \label{tab:constants}
+    \caption {Derived Constants}
+    \label{tab:der_constants}
 \end{table}
 
 
@@ -127,21 +130,44 @@ From the constants, we can derive
 The heat generation rate, given the inlet and outlet temperature
 at steady-state conditions, can be found using this equation:
 
-\[\int^{V} \frac{q'''(z)}{k} dV = C_p \dot{m} (T_{out} - T_{in})\]
-\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{L}_{0} \frac{q'''(z)}{k} dz d\theta dr= C_p \dot{m} (35)\]
+\[\int^{V} q'''(z) dV = C_p \dot{m} (T_{out} - T_{in})\]
+\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{L}_{0} q'''(z) dz d\theta dr= C_p \dot{m} (35)\]
 
 a) Using a constant, average $C_p$ at 307.5C:
-\[C_p = 5650 \frac{J}{kg K}\]
-\[\int^{0.47}_{0} \frac{q'''(z)}{k} L 2\pi dr= 5650 * 186.62 * 35\]
+\[C_p \approx 5.650 \frac{J}{g K}\]
 
-Considering $q'''(0) \neq 0$,
+\[ \pi (0.47^2)  \int^{366}_{0} q'(z) dz = 25766\]
 
-\[q'''(z) = C cos(az)\]
+Assuming $q'(z) = C sin(\frac{z}{L})$,
+and L = 366cm:
 
+\[ 0.6939 (366C(1-cos(1))) = 25766\]
 
+\[168.2C = 25766\]
+\[C = 153.18 \]
 
+\[q'(z) = 153.18 sin(\frac{z}{L})\]
 
+since q'''(z) is $\frac{q'(z)}{\pi R^2}$:
+\[q'''(z) = 220.74 sin(\frac{z}{L})\]
 
+b) By fitting an appropriately ordered polynomial:
+
+First, a dataset is obtained from \cite{moran_fundamentals_2010}
+and plugged into a python script to get the polynomial fit
+(code in Appendix).
+
+First, fitting a fifth-order polynomial we get:
+\[C_p = 7.76e-8 T^5 -3.14e-5 T^4 -0.0066 T^3 +1.69 T^2 +1049T^1 -216055\]
+
+Considering the first three terms are minute, we reduce the 
+number of orders for the polynomial fit. Fitting a third-order and 
+second-order polynomial fit we get:
+
+\[C_p = 0.0281T^3 - 25.58T^2 + 7766 T - 781716 \]
+\[C_p = 0.7245T^2 - 403.24 T + 61525 \]
+
+\pagebreak
 Differential Equation:
 
 For water channel ($R_i < r < R_o$):
@@ -161,6 +187,33 @@ Boundary Conditions:
 Initial Condition:
 \[T(r,0) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) \]
 
+
+\begin{appendices}
+
+\section{For fitting polynomials for Heat Capacity}
+
+\begin{minted}{python}
+def fit_poly_cp(order):
+    """ fits a polynomial for Temp and C_p of Water"""
+    t = np.array([ 280, 300, 320, 340 ])
+    c_p = np.array([ 5280, 5750, 6540, 8240])
+    eq = np.polyfit(t, c_p, order)
+    print(eq)
+    string = ''
+    exponent = order
+    for i in range(0,order):
+        if eq[i] > 0:
+            string = string + '+' + str(eq[i]) + 't^' + str(exponent) + '   '
+        else:
+            string = string + str(eq[i]) + 't^' + str(exponent) + '   '
+            
+        exponent = exponent-1
+    print(string)
+
+\end{minted}
+
+
+\end{appendices}
 \pagebreak
 
 -end of report.

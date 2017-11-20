@@ -4,6 +4,22 @@ import scipy.integrate as integrate
 import scipy.special as special
 import scipy.optimize
 
+def fit_poly_cp(order):
+    """ fits a polynomial for Temp and C_p of Water"""
+    t = np.array([ 280, 290, 320, 340 ])
+    c_p = np.array([ 5280, 5750, 6540, 8240])
+    eq = np.polyfit(t, c_p, order)
+    print(eq)
+    string = ''
+    exponent = order
+    for i in range(0,order):
+        if eq[i] > 0:
+            string = string + '+' + str(eq[i]) + 't^' + str(exponent) + '   '
+        else:
+            string = string + str(eq[i]) + 't^' + str(exponent) + '   '
+            
+        exponent = exponent-1
+    print(string)
 
 def steady_state (r_grid):
     r_list = np.linspace(0, 3, r_grid)
@@ -464,15 +480,7 @@ def hagridd (t_grid, t_max=70):
 #anal_n_diff (100, 2, 15)
 #gimme_a_t(100,[0, 2, 4, 17.7, 31.1, 62.2, 75])
 
-
-gridd([2, 5, 10, 30, 50, 70, 100],70, 10)
-
-plt.ylabel(r'$\frac{Temperature}{T_0}$')
-plt.xlabel('r [cm]')
-plt.legend()
-plt.title('Grid Refinement Study at t = 10 secs')
-plt.savefig('grid_ref_10s.png', format='png')
-plt.show()
+fit_poly_cp(3)
 
 """
 for t_grid in [ 300, 500]:
