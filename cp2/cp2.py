@@ -3,23 +3,24 @@ import matplotlib.pyplot as plt
 import scipy.integrate as integrate
 import scipy.special as special
 import scipy.optimize
+from iapws import IAPWS97
 
 def fit_poly_cp(order):
     """ fits a polynomial for Temp and C_p of Water"""
-    t = np.array([ 280, 290, 320, 340 ])
-    c_p = np.array([ 5280, 5750, 6540, 8240])
-    eq = np.polyfit(t, c_p, order)
+    t = np.linspace(290+273, 320+273, 100)
+    cp = []
+    for temp in t:
+        x = IAPWS97(T=temp, P=15.17)
+        cp.append(x.cp)
+    eq = np.polyfit(t, cp, order)
     print(eq)
-    string = ''
-    exponent = order
-    for i in range(0,order):
-        if eq[i] > 0:
-            string = string + '+' + str(eq[i]) + 't^' + str(exponent) + '   '
-        else:
-            string = string + str(eq[i]) + 't^' + str(exponent) + '   '
-            
-        exponent = exponent-1
-    print(string)
+    eq = list(reversed(eq))
+    print(eq)
+    x =np.polynomial.polynomial.Polynomial(eq)
+    print(x)
+    integral = integrate.quad(x, 290+273, 325+273)
+    print('Result of the Integral for order %s is:' %str(order))
+    print(integral[0])
 
 def steady_state (r_grid):
     r_list = np.linspace(0, 3, r_grid)
@@ -480,7 +481,8 @@ def hagridd (t_grid, t_max=70):
 #anal_n_diff (100, 2, 15)
 #gimme_a_t(100,[0, 2, 4, 17.7, 31.1, 62.2, 75])
 
-fit_poly_cp(3)
+for i in range(1,5):
+    fit_poly_cp(i)
 
 """
 for t_grid in [ 300, 500]:

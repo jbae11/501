@@ -136,36 +136,81 @@ at steady-state conditions, can be found using this equation:
 a) Using a constant, average $C_p$ at 307.5C:
 \[C_p \approx 5.650 \frac{J}{g K}\]
 
-\[ \pi (0.47^2)  \int^{366}_{0} q'(z) dz = 25766\]
+\[ \pi (0.47^2)  \int^{366}_{0} q'''(z) dz = 25766\]
 
-Assuming $q'(z) = C sin(\frac{z}{L})$,
+Assuming $q'''(z) = C sin(\frac{\pi z}{L})$,
 and L = 366cm:
 
-\[ 0.6939 (366C(1-cos(1))) = 25766\]
+\[ 0.6939 (366C(1-cos(\pi))) = 25766\]
 
-\[168.2C = 25766\]
-\[C = 153.18 \]
+\[161.69C = 25766\]
+\[C = 159.34 \]
 
-\[q'(z) = 153.18 sin(\frac{z}{L})\]
+\[q'''(z) = 159.34 sin(\frac{\pi z}{L})\]
 
-since q'''(z) is $\frac{q'(z)}{\pi R^2}$:
-\[q'''(z) = 220.74 sin(\frac{z}{L})\]
+since q'(z) is $q'(z) \cdot \pi R^2$:
+\[q'''(z) = 110.5 sin(\frac{\pi z}{L})\]
 
 b) By fitting an appropriately ordered polynomial:
 
-First, a dataset is obtained from \cite{moran_fundamentals_2010}
-and plugged into a python script to get the polynomial fit
-(code in Appendix).
+The $C_p$ values are obtained using the IAPWS python
+module \cite{romera_iapws_2017}. The $C_p$ values
+in the range are acquired and fitted using
+the polyfit function in the numpy module.
 
 First, fitting a fifth-order polynomial we get:
-\[C_p = 7.76e-8 T^5 -3.14e-5 T^4 -0.0066 T^3 +1.69 T^2 +1049T^1 -216055\]
+\[C_p = 2.31e-9 T^5 -6.54e-6 T^4 +0.0074 T^3 -4.20 T^2 +1191T -135243\]
 
 Considering the first three terms are minute, we reduce the 
-number of orders for the polynomial fit. Fitting a third-order and 
-second-order polynomial fit we get:
+number of orders for the polynomial fit. Fitting a fourth-order and 
+third-order polynomial fit we get:
 
-\[C_p = 0.0281T^3 - 25.58T^2 + 7766 T - 781716 \]
-\[C_p = 0.7245T^2 - 403.24 T + 61525 \]
+\[C_p = 7.83e-6T^3 -1.31e-2T^2 + 7.343 T - 1368 \]
+\[C_p = 4.67e-4T^2 - 0.510 T + 144 \]
+
+A judgement is made to use the fourth-order polynomial.
+
+The energy balance equation then becomes:
+\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
+    (7.83e-6T^3 -1.31e-2T^2 + 7.343 T - 1368  \dot{m}) dT \]
+
+\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
+    (1.95e-6T^4 -4.36e-3T^3 + 3.6715 T^2 - 1368T  \Big|^{598}_{563}) \dot{m})\]
+
+\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
+    416.721 \cdot 130.29)\]
+
+
+\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
+    416.721 \cdot 130.29)\]
+\[ \pi (0.47^2)  \int^{366}_{0} q'''(z) dz = 54294\]
+Assuming $q'''(z) = C sin(\frac{\pi z}{L})$,
+and L = 366cm:
+
+\[ 0.6939 (366C(1-cos(\pi))) = 54294\]
+\[C = 233\]
+\[q'''(z) = 233sin(\frac{\pi z}{L})\]
+\[q'(z) = 161sin(\frac{\pi z}{L})\]
+
+
+Using the third-order fit gives:
+
+\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
+     1.55e-4T^3 - 0.255 T^2 + 144T  \Big|^{598}_{563}) \dot{m})\]
+
+\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
+    187.686 \cdot 130.29)\]
+
+\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
+    187.686 \cdot 130.29)\]
+\[ \pi (0.47^2)  \int^{366}_{0} q'''(z) dz = 24453\]
+Assuming $q'''(z) = C sin(\frac{\pi z}{L})$,
+and L = 366cm:
+
+\[ 0.6939 (366C(1-cos(\pi))) = 24453\]
+\[C = 104\]
+\[q'''(z) = 104sin(\frac{\pi z}{L})\]
+\[q'(z) = 72sin(\frac{\pi z}{L})\]
 
 \pagebreak
 Differential Equation:
