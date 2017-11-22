@@ -5,24 +5,40 @@ import scipy.special as special
 import scipy.optimize
 from iapws import IAPWS97
 
-def fit_poly_cp(order):
+def fit_poly_cp(order_to):
     """ fits a polynomial for Temp and C_p of Water"""
     temp = np.linspace(290+273, 320+273, 100)
     cp =[]
     for i in temp:
         cp.append(IAPWS97(T=i, P=15.17).cp)
-    eq = np.polyfit(temp, cp, order)
-    print(eq)
-    eq = list(reversed(eq))
-    print(eq)
-    x =np.polynomial.polynomial.Polynomial(eq)
-    print(x)
-    integral = integrate.quad(x, 290+273, 325+273)
-    print('Result of the Integral for order %s is:' %str(order))
-    print(integral[0])
-    print('C = ')
-    print(132.446*integral[0] / (366*2*.47**2))
-    print('\n \n')
+    plt.plot(temp, cp, 'ro', label='Data from IAPWS97' )
+
+    for i in range(1, order_to+1):
+        eq = np.polyfit(temp, cp, i)
+        print(eq)
+        eq = list(reversed(eq))
+        print(eq)
+        x = np.polynomial.polynomial.Polynomial(eq)
+        integral = integrate.quad(x, 290+273, 325+273)
+        x = list(x)
+        x = list(reversed(x))
+        print(x)
+        y = np.polyval(x, temp)
+        
+        plt.plot(temp, y, label='Order %s'%str(i))
+        plt.xlim(290+273, 325+273)
+        print('Result of the Integral for order %s is:' %str(i))
+        print(integral[0])
+        print('C = ')
+        print(132.446*integral[0] / (366*2*.47**2))
+        print('\n \n')
+
+    plt.xlabel('T [K]')
+    plt.ylabel('C_p [J/gK]')
+    plt.legend()
+    plt.title('C_p value vs fit')
+    plt.savefig('cp_plot.png', format='png')
+    plt.show()
 
 def steady_state (r_grid):
     r_list = np.linspace(0, 3, r_grid)
@@ -483,8 +499,7 @@ def hagridd (t_grid, t_max=70):
 #anal_n_diff (100, 2, 15)
 #gimme_a_t(100,[0, 2, 4, 17.7, 31.1, 62.2, 75])
 
-for i in range(1,6):
-    fit_poly_cp(i)
+fit_poly_cp(4)
 
 """
 for t_grid in [ 300, 500]:

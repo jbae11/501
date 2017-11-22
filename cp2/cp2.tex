@@ -133,7 +133,7 @@ at steady-state conditions, can be found using this equation:
 \[\int^{V} q'''(z) dV = C_p \dot{m} (T_{out} - T_{in})\]
 \[[Area] \int^{L}_{0} q'''(z) dz d\theta dr= C_p \dot{m} (35)\]
 
-a) Using a constant, average $C_p$ at 307.5C:
+\sbusection*{Using a constant, average $C_p$ at 307.5C}
 \[C_p \approx 5.650 \frac{J}{g K}\]
 
 \[ \pi (0.47^2)  \int^{366}_{0} q'''(z) dz = 25766\]
@@ -151,7 +151,7 @@ and L = 366cm:
 since q'(z) is $q'''(z) \cdot \pi R^2$:
 \[q'(z) = 110.5 sin(\frac{\pi z}{L})\]
 
-b) By fitting an appropriately ordered polynomial:
+\subsection*{By Fitting an appropriately ordered polynomial}
 
 The $C_p$ values are obtained using the IAPWS python
 module \cite{romera_iapws_2017}. The $C_p$ values
@@ -169,7 +169,7 @@ polynomial fit we get:
 \[C_p = 4.67e-4T^2 -5.1e-1T + 144\]
 
 The process of looking for an `appropriate' order fit was automated
-by a python code (in appendix). The results are organized in table \ref{tab:poly_fit}.
+by a python code (in appendix). The results are organized in table \ref{tab:poly_fit} as well as plotted in figure \ref{fig:poly_fit}.
 
 
 \begin{table}[h]
@@ -189,6 +189,15 @@ by a python code (in appendix). The results are organized in table \ref{tab:poly
     \label{tab:poly_fit}
 \end{table}
 
+
+\begin{figure}[htbp!]
+    \begin{center}
+        \includegraphics[scale=0.7]{cp_plot.png}
+    \end{center}
+    \caption{Tempearture vs Heat Capacity from 563K to 598K}
+    \label{fig:poly_fit}
+\end{figure}
+
 Thus, using the second order polynomial fit, the volumetric
 and linear heat generation becomes:
 
@@ -196,12 +205,14 @@ and linear heat generation becomes:
 \[q'''(z) = 113.8 sin(\frac{\pi z}{L})\]
 
 
-c) Discuss.
+\subsection*{Discuss.}
 The answers to both a and b are quite similar, with minor differences.
 The small difference may be due to the short temperature range where
 the $C_p$ values are fitted. The little room for error is also reflected
 on the almost-negligible change in the C value with change in the number of 
 order fits. 
+
+
 
 
 \section*{Coolant Temperature Profile}
@@ -221,11 +232,11 @@ Putting numerical values instead of constants:
 
 \[101.82 (1- cos(\frac{\pi z}{L})) + 27012 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
 
-\[-101.82 cos(\frac{\pi z}{L})) + 27113 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
+\[-101.82 cos(\frac{\pi z}{L}) + 27113 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
 
-\[-101.82 cos(\frac{\pi z}{L})) = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c -27113\]
+\[-101.82 cos(\frac{\pi z}{L}) = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c -27113\]
 
-\[ cos(\frac{\pi z}{L})) = -1.47e-6T_c^3 + 0.0025T_c^2 -1.41 T_c + 266\]
+\[ cos(\frac{\pi z}{L}) = -1.47e-6T_c^3 + 0.0025T_c^2 -1.41 T_c + 266\]
 
 
 \pagebreak
