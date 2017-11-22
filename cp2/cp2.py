@@ -7,12 +7,11 @@ from iapws import IAPWS97
 
 def fit_poly_cp(order):
     """ fits a polynomial for Temp and C_p of Water"""
-    t = np.linspace(290+273, 320+273, 100)
-    cp = []
-    for temp in t:
-        x = IAPWS97(T=temp, P=15.17)
-        cp.append(x.cp)
-    eq = np.polyfit(t, cp, order)
+    temp = np.linspace(290+273, 320+273, 100)
+    cp =[]
+    for i in temp:
+        cp.append(IAPWS97(T=i, P=15.17).cp)
+    eq = np.polyfit(temp, cp, order)
     print(eq)
     eq = list(reversed(eq))
     print(eq)
@@ -21,6 +20,9 @@ def fit_poly_cp(order):
     integral = integrate.quad(x, 290+273, 325+273)
     print('Result of the Integral for order %s is:' %str(order))
     print(integral[0])
+    print('C = ')
+    print(132.446*integral[0] / (366*2*.47**2))
+    print('\n \n')
 
 def steady_state (r_grid):
     r_list = np.linspace(0, 3, r_grid)
@@ -481,7 +483,7 @@ def hagridd (t_grid, t_max=70):
 #anal_n_diff (100, 2, 15)
 #gimme_a_t(100,[0, 2, 4, 17.7, 31.1, 62.2, 75])
 
-for i in range(1,5):
+for i in range(1,6):
     fit_poly_cp(i)
 
 """

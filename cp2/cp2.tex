@@ -101,7 +101,7 @@
        \multicolumn{3}{c}{Assumed Constants - Avg at 580K} \\
        \hline
        Water Density & 0.6982 & $\frac{g}{cm^3}$ \\
-       Specific Heat & 5650 & $\frac{J}{kg\cdot K}$ \\
+       Specific Heat & 5.650 & $\frac{J}{g\cdot K}$ \\
        Thermal Conductivity & 0.591 & $\frac{J}{s\cdot m\cdot k}$ \\       
        \hline
     \end{tabular}
@@ -131,7 +131,7 @@ The heat generation rate, given the inlet and outlet temperature
 at steady-state conditions, can be found using this equation:
 
 \[\int^{V} q'''(z) dV = C_p \dot{m} (T_{out} - T_{in})\]
-\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{L}_{0} q'''(z) dz d\theta dr= C_p \dot{m} (35)\]
+\[[Area] \int^{L}_{0} q'''(z) dz d\theta dr= C_p \dot{m} (35)\]
 
 a) Using a constant, average $C_p$ at 307.5C:
 \[C_p \approx 5.650 \frac{J}{g K}\]
@@ -148,8 +148,8 @@ and L = 366cm:
 
 \[q'''(z) = 159.34 sin(\frac{\pi z}{L})\]
 
-since q'(z) is $q'(z) \cdot \pi R^2$:
-\[q'''(z) = 110.5 sin(\frac{\pi z}{L})\]
+since q'(z) is $q'''(z) \cdot \pi R^2$:
+\[q'(z) = 110.5 sin(\frac{\pi z}{L})\]
 
 b) By fitting an appropriately ordered polynomial:
 
@@ -159,63 +159,79 @@ in the range are acquired and fitted using
 the polyfit function in the numpy module.
 
 First, fitting a fifth-order polynomial we get:
-\[C_p = 2.31e-9 T^5 -6.54e-6 T^4 +0.0074 T^3 -4.20 T^2 +1191T -135243\]
 
-Considering the first three terms are minute, we reduce the 
-number of orders for the polynomial fit. Fitting a fourth-order and 
-third-order polynomial fit we get:
+\[C_p = 2.31e-09 T^5 -6.5e-6 T^4 +7.41e-3 T^3 -4.202 T^2 1.1918e3 T -1.35e5e-9\]
 
-\[C_p = 7.83e-6T^3 -1.31e-2T^2 + 7.343 T - 1368 \]
-\[C_p = 4.67e-4T^2 - 0.510 T + 144 \]
+Considering the last three terms are minute, we reduce the 
+number of orders for the polynomial fit. Fitting a second-order
+polynomial fit we get:
 
-A judgement is made to use the fourth-order polynomial.
+\[C_p = 4.67e-4T^2 -5.1e-1T + 144\]
 
-The energy balance equation then becomes:
-\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
-    (7.83e-6T^3 -1.31e-2T^2 + 7.343 T - 1368  \dot{m}) dT \]
-
-\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
-    (1.95e-6T^4 -4.36e-3T^3 + 3.6715 T^2 - 1368T  \Big|^{598}_{563}) \dot{m})\]
-
-\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
-    416.721 \cdot 130.29)\]
+The process of looking for an `appropriate' order fit was automated
+by a python code (in appendix). The results are organized in table \ref{tab:poly_fit}.
 
 
-\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
-    416.721 \cdot 130.29)\]
-\[ \pi (0.47^2)  \int^{366}_{0} q'''(z) dz = 54294\]
-Assuming $q'''(z) = C sin(\frac{\pi z}{L})$,
-and L = 366cm:
+\begin{table}[h]
+     \centering
+    \begin{tabular}{cc}
+       \hline
+       Order Fit & C Value  \\
+       \hline
+       1 & 163.67 \\
+       2 & 164.1 \\
+       3 & 164.19 \\
+       4 & 164.22 \\
+       5 & 164.22 \\
+       \hline
+    \end{tabular}
+    \caption {Polynomial Fit Order and $C_p dT$ Value.}
+    \label{tab:poly_fit}
+\end{table}
 
-\[ 0.6939 (366C(1-cos(\pi))) = 54294\]
-\[C = 233\]
-\[q'''(z) = 233sin(\frac{\pi z}{L})\]
-\[q'(z) = 161sin(\frac{\pi z}{L})\]
+Thus, using the second order polynomial fit, the volumetric
+and linear heat generation becomes:
+
+\[q'''(z) = 164.1 sin(\frac{\pi z}{L})\]
+\[q'''(z) = 113.8 sin(\frac{\pi z}{L})\]
 
 
-Using the third-order fit gives:
+c) Discuss.
+The answers to both a and b are quite similar, with minor differences.
+The small difference may be due to the short temperature range where
+the $C_p$ values are fitted. The little room for error is also reflected
+on the almost-negligible change in the C value with change in the number of 
+order fits. 
 
-\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
-     1.55e-4T^3 - 0.255 T^2 + 144T  \Big|^{598}_{563}) \dot{m})\]
 
-\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
-    187.686 \cdot 130.29)\]
+\section*{Coolant Temperature Profile}
+With the heat generation found, it can be plugged back
+into the energy equation to find $T_c(z)$:
 
-\[\int^{0.47}_{0} \int^{2\pi}_{0} \int^{366}_{0} q'''(z) dz d\theta dr= 
-    187.686 \cdot 130.29)\]
-\[ \pi (0.47^2)  \int^{366}_{0} q'''(z) dz = 24453\]
-Assuming $q'''(z) = C sin(\frac{\pi z}{L})$,
-and L = 366cm:
+\[[Area] \int^{z}_0 q'''(z) dz = \int^{T_c (z)}_{T_{in}} C_p(T) \dot{m} dT\]
+\[\pi (.47^2) * 164.1 \int^{z}_0 sin(\frac{\pi z}{L})  dz =
+    130.29 \int^{T_c (z)}_{T_{in}} (4.67e-4T^2 -5.1e-1T + 144)  dT\]
+\[\pi (.47^2) * 164.1 * (\frac{L}{\pi} (1-cos(\frac{\pi z}{L}))) =
+    130.29 (1.5e-4T^3 - .255T^2 + 144 T \Big{|}^{T_c (z)}_{T_{in}})\]
 
-\[ 0.6939 (366C(1-cos(\pi))) = 24453\]
-\[C = 104\]
-\[q'''(z) = 104sin(\frac{\pi z}{L})\]
-\[q'(z) = 72sin(\frac{\pi z}{L})\]
+Putting numerical values instead of constants:
+
+\[\pi (.47^2) * 164.1 * (\frac{366}{\pi} (1-cos(\frac{\pi z}{L}))) =
+    130.29 (1.5e-4T^3 - .255T^2 + 144 T \Big{|}^{T_c (z)}_{563})\]
+
+\[101.82 (1- cos(\frac{\pi z}{L})) + 27012 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
+
+\[-101.82 cos(\frac{\pi z}{L})) + 27113 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
+
+\[-101.82 cos(\frac{\pi z}{L})) = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c -27113\]
+
+\[ cos(\frac{\pi z}{L})) = -1.47e-6T_c^3 + 0.0025T_c^2 -1.41 T_c + 266\]
+
 
 \pagebreak
 Differential Equation:
 
-For water channel ($R_i < r < R_o$):
+For water channel ($R_i \leq r \leq R_o$):
 \[\frac{1}{\alpha} \cdot (\frac{dT}{dt} + (V_r \frac{dT}{dr} + V_z \frac{dT}{dz})) =
   \frac{1}{dr} \frac{d}{dr} (r \frac{dT}{dr}) + \frac{d^2T}{dz^2})\]
 
@@ -233,6 +249,8 @@ Initial Condition:
 \[T(r,0) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) \]
 
 
+
+
 \begin{appendices}
 
 \section{For fitting polynomials for Heat Capacity}
@@ -240,21 +258,19 @@ Initial Condition:
 \begin{minted}{python}
 def fit_poly_cp(order):
     """ fits a polynomial for Temp and C_p of Water"""
-    t = np.array([ 280, 300, 320, 340 ])
-    c_p = np.array([ 5280, 5750, 6540, 8240])
-    eq = np.polyfit(t, c_p, order)
-    print(eq)
-    string = ''
-    exponent = order
-    for i in range(0,order):
-        if eq[i] > 0:
-            string = string + '+' + str(eq[i]) + 't^' + str(exponent) + '   '
-        else:
-            string = string + str(eq[i]) + 't^' + str(exponent) + '   '
-            
-        exponent = exponent-1
-    print(string)
-
+    temp = np.linspace(290+273, 320+273, 100)
+    cp =[]
+    for i in temp:
+        cp.append(IAPWS97(T=i, P=15.17).cp)
+    eq = np.polyfit(temp, cp, order)
+    eq = list(reversed(eq))
+    x =np.polynomial.polynomial.Polynomial(eq)
+    integral = integrate.quad(x, 290+273, 325+273)
+    print('Result of the Integral for order %s is:' %str(order))
+    print(integral[0])
+    print('C = ')
+    print(132.446*integral[0] / (366*2*.47**2))
+    print('\n \n')
 \end{minted}
 
 
