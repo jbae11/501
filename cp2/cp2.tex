@@ -133,7 +133,7 @@ at steady-state conditions, can be found using this equation:
 \[\int^{V} q'''(z) dV = C_p \dot{m} (T_{out} - T_{in})\]
 \[[Area] \int^{L}_{0} q'''(z) dz d\theta dr= C_p \dot{m} (35)\]
 
-\sbusection*{Using a constant, average $C_p$ at 307.5C}
+\subsection*{Using a constant, average $C_p$ at 307.5C}
 \[C_p \approx 5.650 \frac{J}{g K}\]
 
 \[ \pi (0.47^2)  \int^{366}_{0} q'''(z) dz = 25766\]
@@ -230,13 +230,53 @@ Putting numerical values instead of constants:
 \[\pi (.47^2) * 164.1 * (\frac{366}{\pi} (1-cos(\frac{\pi z}{L}))) =
     130.29 (1.5e-4T^3 - .255T^2 + 144 T \Big{|}^{T_c (z)}_{563})\]
 
-\[101.82 (1- cos(\frac{\pi z}{L})) + 27012 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
+\[101.82 (1- cos(\frac{\pi z}{L})) + 28024 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
 
-\[-101.82 cos(\frac{\pi z}{L}) + 27113 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
+\[-101.82 cos(\frac{\pi z}{L}) + 28125.82 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
 
-\[-101.82 cos(\frac{\pi z}{L}) = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c -27113\]
+\[ cos(\frac{\pi z}{L}) = -1.47e-6T_c^3 + 0.0025T_c^2 -1.41 T_c + 276.23\]
 
-\[ cos(\frac{\pi z}{L}) = -1.47e-6T_c^3 + 0.0025T_c^2 -1.41 T_c + 266\]
+To find $T_c(z)$, a root solver is used.
+
+
+
+\section*{Analytically Solve 1D Fuel Temperature Profile}
+Ignoring Axial Conduction, we get:
+
+\[\frac{1}{r} \frac{d}{dr} (r \frac{d^T}{dr}) = -\frac{-q'''(z)}{k}\]
+\[k = 0.057 \frac{W}{cm\cdot K}\]
+
+q'''(z) values for z values L/4, L/2, 3L/4 are listed in table \ref{tab:q_vol}.
+The value of thermal conductivity of uranium oxide is from \cite{ronchi_thermal_1999}.
+
+\begin{table}[h]
+     \centering
+    \begin{tabular}{ccc}
+       \hline
+       z value & q'''(z) [W/cmK]  \\
+       \hline
+       L/4 & 116.03 \\
+       L/2 & 164.1 \\
+       3L/4 & 116.03 \\
+       \hline
+    \end{tabular}
+    \caption {q'''(z) value for various z values}
+    \label{tab:q_vol}
+\end{table}
+
+Integrating the differential equation to obtain the temperature profile for the
+1D fuel:
+
+
+\[ (r \frac{d^T}{dr}) = -\frac{-q'''(z)r^2}{2k} + C_1 \]
+
+\[ \frac{d^T}{dr} = -\frac{-q'''(z)r}{2k} + \frac{C_1}{r} \]
+
+\[ T_{1D} = -\frac{-q'''(z)r^2}{4k} + C_1 ln(r) + C_2 \]
+Applying BC at r=0, C1 = 0.
+Applying convective BC:
+\[ -k \frac{dT}{dr}(r= 0.49 cm) = h (T(r = 0.49 cm ) - T_{coolant})\]
+
 
 
 \pagebreak

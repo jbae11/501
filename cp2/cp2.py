@@ -40,19 +40,66 @@ def fit_poly_cp(order_to):
     plt.savefig('cp_plot.png', format='png')
     plt.show()
 
-def steady_state (r_grid):
-    r_list = np.linspace(0, 3, r_grid)
-    temp = (3/2) * ((np.pi**2) + 6) / (3 * (np.pi**2))
-    t = [temp] * r_grid
 
-    plt.plot(r_list, t, label = 'Steady State Temperature')
-    plt.ylabel(r'$\frac{Temperature}{T_0}$')
-    plt.xlabel('r [cm]')
-    plt.legend()
-    plt.title('Steady State Temperature of the Sphere')
-    plt.savefig('steady_state.png', format='png')
+def root_solver():
+    """ fits a polynomial for Temp and C_p of Water"""
+    z = np.linspace(0, 366, 10600)
+    t_c = []
+    for i in z:
+        root = np.roots([-1.47e-6, 0.0025, -1.41, 276-np.cos(np.pi * i / 366)])
+        print(root)
+        filtered_root = float(str(root[0])[1:-4])
+        t_c.append(filtered_root)
+    plt.plot(t_c, z)
     plt.show()
 
+
+def fuel_rod_temp():
+    """ temperature distribution in the fuel rod T_f(r,z)"""
+
+    # k of UOX at 300C:
+    k = 5.7 
+    change = 10000
+    zee = np.linspace(0,366, 10)
+    dz = zee[1]-zee[0]
+    q_vol = 164.1*np.sin(np.pi * zee / 366)
+    ar = np.linspace(0, 0.47, 50)
+    dr = ar[1]-ar[0]
+    t = np.ndarray(shape=(len(zee),len(ar)), dtype=float)
+    # insulated bc at z=0 and z=L
+    for r in range(0,len(ar)):
+        t[0][r] = 563
+        t[1][r] = 563
+        t[-1][r] = 598
+        t[-2][r] = 598
+
+
+    trold = np.zeros(len(ar))
+    while zchange > 1e-3:
+        for z in range(2,len(zee)-1):
+            while change > 1e-3:
+                for r in range(2,len(ar)-2):
+                    one = - (t[z-1][r] + t[z+1][r])/(dz**2)
+                    two = t[z][r-1]/(ar[r] * dr)
+                    three = - (t[z][r-1] + t[z][r+1]) / (dr**2)
+                    four = - q_vol[z] / k
+                    denom = -2/(dz**2) -2/(dr**2) + 1/(ar[r]*dr)
+                    t[z][r] = (one + two + three + four) / denom
+
+                # BC at r=0
+                t[z][0] = t[z][1]
+                tr = t[z][:]
+                print('iteration')
+                change = max(tr-trold)
+                trold = tr
+            one = - (t[z-1][r] + t[z+1][r])/(dz**2)
+            two = t[z][r-1]/(ar[r] * dr)
+            three = - (t[z][r-1] + t[z][r+1]) / (dr**2)
+            four = - q_vol[z] / k
+            denom = -2/(dz**2) -2/(dr**2) + 1/(ar[r]*dr)
+            t[z][r] = (one + two + three + four) / denom    
+            print('ziteration')
+    print(t)
 def numerical (r_grid, t_max, t_grid):
     # GRID AND STUFF 
     R = 3
@@ -493,27 +540,5 @@ def hagridd (t_grid, t_max=70):
     plt.savefig('t_grid_%s.png' %t_grid, format='png')
     plt.show()
 
-#steady_state(100)
-#analytical(100, 70, 10, 20)
-#numerical(100, 70)
-#anal_n_diff (100, 2, 15)
-#gimme_a_t(100,[0, 2, 4, 17.7, 31.1, 62.2, 75])
 
-fit_poly_cp(4)
-
-"""
-for t_grid in [ 300, 500]:
-    hagridd(t_grid)
-"""
-"""
-#analytical vs numerical
-for t in [2, 4, 17.7, 31.1, 62.2, 75]:
-    num_champ([100], 70, t)
-    anal_champ(100, [t])
-    plt.ylabel(r'$\frac{Temperature}{T_0}$')
-    plt.xlabel('r [cm]')
-    plt.legend()
-    plt.title('Converged Solution at t = %s' %str(t))
-    plt.savefig('conv_%ss.png' %str(t), format='png')
-    plt.close()
-"""
+fuel_rod_temp()
