@@ -29,12 +29,7 @@
 \usepackage{titling}
 \usepackage{minted}
 
-\newcommand{\subtitle}[1]{%
-  \posttitle{%
-    \par\end{center}
-    \begin{center}\large#1\end{center}
-    \vskip0.5em}%
-}
+
 \usepackage{tikz}
 
 
@@ -131,7 +126,7 @@ The heat generation rate, given the inlet and outlet temperature
 at steady-state conditions, can be found using this equation:
 
 \[\int^{V} q'''(z) dV = C_p \dot{m} (T_{out} - T_{in})\]
-\[[Area] \int^{L}_{0} q'''(z) dz d\theta dr= C_p \dot{m} (35)\]
+\[[Area] \int^{L}_{0} q'''(z) dz = C_p \dot{m} (35 K)\]
 
 \subsection*{Using a constant, average $C_p$ at 307.5C}
 \[C_p \approx 5.650 \frac{J}{g K}\]
@@ -154,7 +149,7 @@ since q'(z) is $q'''(z) \cdot \pi R^2$:
 \subsection*{By Fitting an appropriately ordered polynomial}
 
 The $C_p$ values are obtained using the IAPWS python
-module \cite{romera_iapws_2017}. The $C_p$ values
+module \cite{romera_iapws:_2017}. The $C_p$ values
 in the range are acquired and fitted using
 the polyfit function in the numpy module.
 
@@ -202,7 +197,7 @@ Thus, using the second order polynomial fit, the volumetric
 and linear heat generation becomes:
 
 \[q'''(z) = 164.1 sin(\frac{\pi z}{L})\]
-\[q'''(z) = 113.8 sin(\frac{\pi z}{L})\]
+\[q'(z) = 113.8 sin(\frac{\pi z}{L})\]
 
 
 \subsection*{Discuss.}
@@ -236,9 +231,37 @@ Putting numerical values instead of constants:
 
 \[ cos(\frac{\pi z}{L}) = -1.47e-6T_c^3 + 0.0025T_c^2 -1.41 T_c + 276.23\]
 
-To find $T_c(z)$, a root solver is used.
+To find $T_c(z)$, a root solver is used for every z value(code in appendix).
+The coolant temperature profile is plotted in figure \ref{fig:t_c_z}.
+
+\begin{figure}[htbp!]
+    \begin{center}
+        \includegraphics[scale=0.7]{t_c_z.png}
+    \end{center}
+    \caption{Temperature of coolant with respect to z.}
+    \label{fig:t_c_z}
+\end{figure}
 
 
+\section*{Getting the heat transfer coefficient}
+The heat transfer coefficient is obtained using the Dittus-Bolter Correlation,
+where the Nusselt number is a function of the heat transfer coefficient.
+
+\[ Nu = 0.023 Re^0.8 Pr^0.4 = \frac{h L}{k}\]
+
+\[ Nu = 0.023 (\frac{\rho v L}{\mu})^{0.8} (\frac{\mu C_p}{k})^{0.4} = \frac{h L}{k}\]
+
+where
+\[v = \text{velocity of fluid} = 350 \frac{cm}{s}\]
+\[L = \text{Characteristic length} = .31 cm \]
+\[\rho = \text{Density of Fluid} \approx 0.7096 \frac{g}{cm^3}\]
+\[\mu = \text{viscosity of fluid} \approx 0.00086 \frac{g}{cm s}\]
+\[C_p = \text{ Specific Heat of fluid} \approx 5.650 \frac{J}{g K} \]
+\[k = \text{thermal conductivity of fluid} \approx 0.00563\frac{W}{cm K} \]
+
+the ones with $\approx$ are values that change with temperature. The temperature
+for the approximate values are at 573K. Given this temperature, the Nusselt Number 
+becomes 197.17, and heat transfer coefficient 3.5854 $\frac{W}{cm^2 K}$.
 
 \section*{Analytically Solve 1D Fuel Temperature Profile}
 Ignoring Axial Conduction, we get:
@@ -246,21 +269,22 @@ Ignoring Axial Conduction, we get:
 \[\frac{1}{r} \frac{d}{dr} (r \frac{d^T}{dr}) = -\frac{-q'''(z)}{k}\]
 \[k = 0.057 \frac{W}{cm\cdot K}\]
 
-q'''(z) values for z values L/4, L/2, 3L/4 are listed in table \ref{tab:q_vol}.
+q'''(z) and $T_c$, and h  values for z values L/4, L/2, 3L/4 are listed in table \ref{tab:q_vol}.
+The values are obtained from previous problems, and using a script (in appendix).
 The value of thermal conductivity of uranium oxide is from \cite{ronchi_thermal_1999}.
 
 \begin{table}[h]
      \centering
-    \begin{tabular}{ccc}
+    \begin{tabular}{cccc}
        \hline
-       z value & q'''(z) [W/cmK]  \\
+       z value & q'''(z) [W/cmK] & $T_c(z) [K]$ & $h [\frac{W}{cm^2 K}] $ \\
        \hline
-       L/4 & 116.03 \\
-       L/2 & 164.1 \\
-       3L/4 & 116.03 \\
+       L/4 & 116.03 & 568.2 & 3.591 \\
+       L/2 & 164.1 & 581.04 & 3.575 \\
+       3L/4 & 116.03 & 593.78 & 3.567 \\
        \hline
     \end{tabular}
-    \caption {q'''(z) value for various z values}
+    \caption {q'''(z), $T_c$ and h value for various z values}
     \label{tab:q_vol}
 \end{table}
 
@@ -275,7 +299,54 @@ Integrating the differential equation to obtain the temperature profile for the
 \[ T_{1D} = -\frac{-q'''(z)r^2}{4k} + C_1 ln(r) + C_2 \]
 Applying BC at r=0, C1 = 0.
 Applying convective BC:
-\[ -k \frac{dT}{dr}(r= 0.49 cm) = h (T(r = 0.49 cm ) - T_{coolant})\]
+\[ -k \frac{dT}{dr}(r= 0.47 cm) = h (T(r = 0.47 cm ) - T_{coolant})\]
+
+\[-k \frac{dT}{dr}(r = 0.47 cm) = q'''(z) * 4.122\]
+\[h (T(r = 0.47 cm ) - T_{coolant}) = h(z) (0.96 q'''(z)  + C_2 - T_{coolant}) \]
+This makes:
+\[C_2 = q'''(z) (\frac{4.122}{h} +.96) + T_{coolant}\]
+
+The $C_2$ values obtained with the equation is listed in table \ref{tab:c2}.
+The fuel temperature is plotted in figure \ref{fig:t_f_r}.
+
+\begin{table}[h]
+     \centering
+    \begin{tabular}{ccc}
+       \hline
+       z value & $C_2$ & equation \\
+       \hline
+       L/4 & 323.6  & $T_{1D} = -\frac{-q'''(z)r^2}{4k} + 323.6$ \\
+       L/2 & 234.29 & $T_{1D} = -\frac{-q'''(z)r^2}{4k} + 234.29$ \\
+       3L/4 & 348.30 & $T_{1D} = -\frac{-q'''(z)r^2}{4k} + 348.3$\\
+       \hline
+    \end{tabular}
+    \caption {$C_2$ value for different z values}
+    \label{tab:c2}
+\end{table}
+
+
+\begin{figure}[htbp!]
+    \begin{center}
+        \includegraphics[scale=0.7]{t_f_r.png}
+    \end{center}
+    \caption{Temperature of Fuel with respect to r for different z values.}
+    \label{fig:t_f_r}
+\end{figure}
+
+\section*{Varying Density with temperature}
+Since temperature in the coolant varies with height in the core,
+the density changes as well. The same module used to obtain $C_p$
+is used to obtain the density values \cite{romera_iapws:_2017}.
+Plugging in the temperature value to obtain the density value, we get
+figure \ref{fig:rho_c_z}
+
+\begin{figure}[htbp!]
+    \begin{center}
+        \includegraphics[scale=0.7]{rho_c_z.png}
+    \end{center}
+    \caption{Density of Coolant with respect to z.}
+    \label{fig:rho_c_z}
+\end{figure}
 
 
 
@@ -302,6 +373,11 @@ Initial Condition:
 
 
 
+\bibliographystyle{abbrv}
+\bibliography{bibliography}
+\pagebreak
+
+
 \begin{appendices}
 
 \section{For fitting polynomials for Heat Capacity}
@@ -322,6 +398,46 @@ def fit_poly_cp(order):
     print('C = ')
     print(132.446*integral[0] / (366*2*.47**2))
     print('\n \n')
+\end{minted}
+
+\section{For finding $T_c(z)$}
+
+\begin{minted}{python}
+def root_solver():
+    """ fits a polynomial for Temp and C_p of Water"""
+    z = np.linspace(0, 366, 100)
+    t_c = []
+    for i in z:
+        root = np.roots([-1.47e-6, 0.0025, -1.41, 276.23-np.cos(np.pi * i / 366)])
+        print(root)
+        print(type(root))
+        filtered_root = float(str(root[0])[1:7])
+        t_c.append(filtered_root)
+
+    plt.plot(t_c, z)
+    plt.show()
+\end{minted}
+
+\section{For finding h}
+
+\begin{minted}{python}
+
+def find_h():
+    ri = 0.47
+    ro = 0.625
+    v = 350
+    for i in [568.2, 581.04, 593.78]:
+        L = 4 * np.pi*(ro**2 - ri**2) / (2*np.pi*ro + 2*np.pi*ri)
+        mu = IAPWS97(T=i, P=15.17).mu * 10
+        rho = IAPWS97(T=i, P=15.17).rho /1000
+        cp = IAPWS97(T=i, P=15.17).cp
+        k = IAPWS97(T=i, P=15.17).k /100
+        Re = rho*v*L / mu
+        Pr = mu*cp / k
+        Nu = 0.023 * Re**(0.8) * Pr**(0.4)
+        h = Nu * k / L
+        print(h)
+        print('\n')
 \end{minted}
 
 
