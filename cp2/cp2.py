@@ -56,6 +56,7 @@ def root_solver():
     plt.plot(t_c, z)
     plt.show()
 
+
 def shit():
     z = np.linspace(0, 366, 1000)
     t_c = []
@@ -82,11 +83,28 @@ def shit():
     plt.show()
 """
 
+def find_tc():
+    z = np.linspace(0, 366, 1000)
+    t_c = []
+    rho_c = []
+    for i in z:
+        kewl = 581.02-18.011*np.cos(np.pi*i / 366)
+        t_c.append(kewl)
+
+    return t_c
+
+
 def find_h():
     ri = 0.47
     ro = 0.625
     v = 350
-    for i in [568.2, 581.04, 593.78]:
+    z = np.linspace(0, 366, 1000)
+    t_c = []
+    h_list = []
+    for i in z:
+        temp = 581.02-18.011*np.cos(np.pi*i /366)
+        t_c.append(temp)
+    for i in t_c:
         L = 4 * np.pi*(ro**2 - ri**2) / (2*np.pi*ro + 2*np.pi*ri)
         mu = IAPWS97(T=i, P=15.17).mu * 10
         rho = IAPWS97(T=i, P=15.17).rho /1000
@@ -96,9 +114,16 @@ def find_h():
         Pr = mu*cp / k
         Nu = 0.023 * Re**(0.8) * Pr**(0.4)
         h = Nu * k / L
-        print(h)
-        print('\n')
+        h_list.append(h)
 
+    plt.plot(h_list, z)
+    plt.xlabel('Heat Transfer Coefficient [W/cm^2 k]')
+    plt.ylabel('z [cm]')
+    plt.title('Heat Transfer Coefficient vs z')
+    plt.savefig('h_z.png', format='png')
+    plt.show() 
+
+    return h_list
 
 def find_c2():
     q_vol_list = [116.03, 164.1, 116.03]
@@ -179,5 +204,4 @@ def fuel_rod_temp():
 
 ########################################################
 
-
-shit()
+find_h()
