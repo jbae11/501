@@ -83,8 +83,8 @@ def shit():
     plt.show()
 """
 
-def find_tc():
-    z = np.linspace(0, 366, 1000)
+def find_tc(z_grid):
+    z = np.linspace(0, 366, z_grid)
     t_c = []
     rho_c = []
     for i in z:
@@ -94,11 +94,11 @@ def find_tc():
     return t_c
 
 
-def find_h():
+def find_h(z_grid):
     ri = 0.47
     ro = 0.625
     v = 350
-    z = np.linspace(0, 366, 1000)
+    z = np.linspace(0, 366, z_grid)
     t_c = []
     h_list = []
     for i in z:
@@ -116,12 +116,6 @@ def find_h():
         h = Nu * k / L
         h_list.append(h)
 
-    plt.plot(h_list, z)
-    plt.xlabel('Heat Transfer Coefficient [W/cm^2 k]')
-    plt.ylabel('z [cm]')
-    plt.title('Heat Transfer Coefficient vs z')
-    plt.savefig('h_z.png', format='png')
-    plt.show() 
 
     return h_list
 
@@ -144,52 +138,48 @@ def find_c2():
     plt.show()
 
 
-def fuel_rod_temp():
+def fuel_rod_temp(z_grid):
     """ temperature distribution in the fuel rod T_f(r,z)"""
 
     # k of UOX at 300C:
     k = 5.7 
     change = 10000
-    zee = np.linspace(0,366, 10)
+    zee = np.linspace(0,366, z_grid)
     dz = zee[1]-zee[0]
     q_vol = 164.1*np.sin(np.pi * zee / 366)
     ar = np.linspace(0, 0.47, 50)
     dr = ar[1]-ar[0]
-    t = np.ndarray(shape=(len(zee),len(ar)), dtype=float)
+    h = find_h(z_grid)
+    t_c = find_tc(z_grid)
+    print(h)
+    print(t_c)
+    print(q_vol)
+    t = np.zeros(shape=(len(zee),len(ar)), dtype=float)
     # insulated bc at z=0 and z=L
-    for r in range(0,len(ar)):
-        t[0][r] = 563
-        t[1][r] = 563
-        t[-1][r] = 598
-        t[-2][r] = 598
-
+    # convective bc at r = 0.47
+    # r=0 bc
 
     trold = np.zeros(len(ar))
-    while zchange > 1e-3:
-        for z in range(2,len(zee)-1):
-            while change > 1e-3:
-                for r in range(2,len(ar)-2):
-                    one = - (t[z-1][r] + t[z+1][r])/(dz**2)
-                    two = t[z][r-1]/(ar[r] * dr)
-                    three = - (t[z][r-1] + t[z][r+1]) / (dr**2)
-                    four = - q_vol[z] / k
-                    denom = -2/(dz**2) -2/(dr**2) + 1/(ar[r]*dr)
-                    t[z][r] = (one + two + three + four) / denom
+    for z in range(2,len(zee)-1):
+        while change > 1e-3:
+            for r in range(2,len(ar)-1):
+                one = - (t[z-1][r] + t[z+1][r])/(dz**2)
+                two = t[z][r-1]/(ar[r] * dr)
+                three = - (t[z][r-1] + t[z][r+1]) / (dr**2)
+                four = - q_vol[z] / k
+                denom = 2/(dz**2) 2/(dr**2) - 1/(ar[r]*dr)
+                t[z][r] = (one + two + three + four) / denom
 
-                # BC at r=0
-                t[z][0] = t[z][1]
-                tr = t[z][:]
-                print('iteration')
-                change = max(tr-trold)
-                trold = tr
-            one = - (t[z-1][r] + t[z+1][r])/(dz**2)
-            two = t[z][r-1]/(ar[r] * dr)
-            three = - (t[z][r-1] + t[z][r+1]) / (dr**2)
-            four = - q_vol[z] / k
-            denom = -2/(dz**2) -2/(dr**2) + 1/(ar[r]*dr)
-            t[z][r] = (one + two + three + four) / denom    
-            print('ziteration')
-    print(t)
+            #convective BC:
+            t[z][-1] = k*(t[z][-2] - h[z] * t_c[z] * dr) / (k - h[z] * dr)
+            # BC at r=0
+            t[z][0] = t[z][1]
+            tr = t[z][:]
+            print('iteration')
+            change = max(tr-trold)
+            trold = tr
+        print('ziteration')
+
 
 
 ########################################################
@@ -204,4 +194,4 @@ def fuel_rod_temp():
 
 ########################################################
 
-find_h()
+fuel_rod_temp(10)
