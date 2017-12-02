@@ -89,7 +89,7 @@
        Fuel Element Pitch & 1.25 & cm \\
        Fuel Element Outer Diameter & 0.94& cm \\
        Pellet-Clad Gap & 0.0082 & cm \\
-       \textbf{Outer Radius} & 0.625 & cm \\
+       \textbf{Outer us} & 0.625 & cm \\
        \textbf{Total Fuel Radius} & 0.47 & cm \\
        \textbf{Active Core Height} & 366 & cm \\
        \hline
@@ -189,7 +189,7 @@ by a python code (in appendix). The results are organized in table \ref{tab:poly
     \begin{center}
         \includegraphics[scale=0.7]{cp_plot.png}
     \end{center}
-    \caption{Tempearture vs Heat Capacity from 563K to 598K}
+    \caption{Temperature vs Heat Capacity from 563K to 598K}
     \label{fig:poly_fit}
 \end{figure}
 
@@ -205,7 +205,16 @@ The answers to both a and b are quite similar, with minor differences.
 The small difference may be due to the short temperature range where
 the $C_p$ values are fitted. The little room for error is also reflected
 on the almost-negligible change in the C value with change in the number of 
-order fits. 
+order fits. The volumetric heat generation with respect to height is plotted in
+figure \ref{fig:q_vol}
+
+\begin{figure}[htbp!]
+    \begin{center}
+        \includegraphics[scale=0.7]{q_vol_z.png}
+    \end{center}
+    \caption{Volumetric heat generation with respect to height obtained by polynomial fit.}
+    \label{fig:q_vol}
+\end{figure}
 
 
 
@@ -225,11 +234,11 @@ Putting numerical values instead of constants:
 \[\pi (.47^2) * 164.1 * (\frac{366}{\pi} (1-cos(\frac{\pi z}{L}))) =
     130.29 (1.5e-4T^3 - .255T^2 + 144 T \Big{|}^{T_c (z)}_{563})\]
 
-\[101.82 (1- cos(\frac{\pi z}{L})) + 28024 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
+\[101.82 (1- cos(\frac{\pi z}{L})) + 27012 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
 
-\[-101.82 cos(\frac{\pi z}{L}) + 28125.82 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
+\[-101.82 cos(\frac{\pi z}{L}) + 27114 = 1.5e-4T_c^3 - .255T_c^2 + 144 T_c \]
 
-\[ cos(\frac{\pi z}{L}) = -1.47e-6T_c^3 + 0.0025T_c^2 -1.41 T_c + 276.23\]
+\[ cos(\frac{\pi z}{L}) = -1.47e-6T_c^3 + 0.0025T_c^2 -1.41 T_c + 265\]
 
 To find $T_c(z)$, a root solver is used for every z value(code in appendix).
 The coolant temperature profile is plotted in figure \ref{fig:t_c_z}.
@@ -247,7 +256,7 @@ The coolant temperature profile is plotted in figure \ref{fig:t_c_z}.
 The heat transfer coefficient is obtained using the Dittus-Bolter Correlation,
 where the Nusselt number is a function of the heat transfer coefficient.
 
-\[ Nu = 0.023 Re^0.8 Pr^0.4 = \frac{h L}{k}\]
+\[ Nu = 0.023 Re^{0.8} Pr^{0.4} = \frac{h L}{k}\]
 
 \[ Nu = 0.023 (\frac{\rho v L}{\mu})^{0.8} (\frac{\mu C_p}{k})^{0.4} = \frac{h L}{k}\]
 
@@ -277,11 +286,47 @@ The plot is shown in figure \ref{fig:h_z}
 
 \section*{Using Computer Code for Temperature Distribution in Fuel Rod}
 
+The temperature in the fuel rod is governed by the differential equation:
+\[ \frac{d^2T}{dz^2} + \frac{1}{r} \frac{d}{dr} (r \frac{dT}{dr}) + \frac{q'''(z)}{k} = 0\]
+
+\[ \frac{d^2T}{dz^2} + (\frac{d^2T}{dr^2} + \frac{1}{r} \frac{dT}{dr}) + \frac{q'''(z)}{k} = 0\]
+
+Using the finite difference method, the differential equation becomes,
+
+\[\frac{u_{z+1}^r - 2u_z^r + u_{z-1}}{dz^2}^r + \frac{u^{r+1}_z - 2u^r_z + u^{r-1}_z}{dr^2}
+  + \frac{1}{r} \frac{u^{r+1}_z - u^{r-1}_z}{2dr} + \frac{q_z^r}{k} = 0 \]
+
+solving for $u_z^r$:
+
+\[ u_z^r = \frac{u_{z+1}^r + u_{z-1}^r}{dz^2} + \frac{u^{r+1}_z + u^{r-1}_z}{dr^2}
+  + \frac{1}{r} \frac{u^{r+1}_z - u^{r-1}_z}{2dr} + \frac{q_z}{k}\]
+
+With boundary conditions:
+
+\begin{enumerate}
+    \item $\frac{dT}{dr}(r=0) = 0$
+    \item $-k \frac{dT}{dr} (r=R) = h(T(r=R) - T_c)$
+    \item $\frac{dT}{dz}(z=0) = 0 $
+    \item $\frac{dT}{dz}(z=L) = 0 $
+\end{enumerate}
+
+using finite difference, the boundary conditions become the following.
+The first index is the z element, and the second the r element. The indexing
+standard follows Python.
+\begin{enumerate}
+    \item $u[z][1]-u[z][0] = 0$
+    \item $-k \frac{u[z][-2]-u[z][-1]}{dr} = h(u[z][-1] - T_c)$
+    \item $ \frac{u[1][r] - u[0][r]}{dz} = 0$
+    \item $\frac{u[-2][r] - u[-1][r]}{dz} = 0 $
+\end{enumerate}
+
+
+
 
 \section*{Analytically Solve 1D Fuel Temperature Profile}
 Ignoring Axial Conduction, we get:
 
-\[\frac{1}{r} \frac{d}{dr} (r \frac{d^T}{dr}) = -\frac{-q'''(z)}{k}\]
+\[\frac{1}{r} \frac{d}{dr} (r \frac{d^T}{dr}) = \frac{-q'''(z)}{k}\]
 \[k = 0.057 \frac{W}{cm\cdot K}\]
 
 q'''(z) and $T_c$, and h  values for z values L/4, L/2, 3L/4 are listed in table \ref{tab:q_vol}.
@@ -307,19 +352,20 @@ Integrating the differential equation to obtain the temperature profile for the
 1D fuel:
 
 
-\[ (r \frac{d^T}{dr}) = -\frac{-q'''(z)r^2}{2k} + C_1 \]
+\[ (r \frac{dT}{dr}) = \frac{-q'''(z)r^2}{2k} + C_1 \]
 
-\[ \frac{d^T}{dr} = -\frac{-q'''(z)r}{2k} + \frac{C_1}{r} \]
+\[ \frac{dT}{dr} = \frac{-q'''(z)r}{2k} + \frac{C_1}{r} \]
 
-\[ T_{1D} = -\frac{-q'''(z)r^2}{4k} + C_1 ln(r) + C_2 \]
-Applying BC at r=0, C1 = 0.
+\[ T_{1D} = \frac{-q'''(z)r^2}{4k} + C_1 ln(r) + C_2 \]
+Applying BC at r=0, $C_1$ = 0.
 Applying convective BC:
 \[ -k \frac{dT}{dr}(r= 0.47 cm) = h (T(r = 0.47 cm ) - T_{coolant})\]
-
-\[-k \frac{dT}{dr}(r = 0.47 cm) = q'''(z) * 4.122\]
-\[h (T(r = 0.47 cm ) - T_{coolant}) = h(z) (0.96 q'''(z)  + C_2 - T_{coolant}) \]
+\[ k( \frac{q'''R}{2k}) = h (\frac{-q'''R^2}{4k} + C_2 + T_{coolant})\]
 This makes:
-\[C_2 = q'''(z) (\frac{4.122}{h} +.96) + T_{coolant}\]
+\[C_2 = \frac{q'''R}{2} + \frac{hq'''R^2}{4k} + hT_{coolant}\]
+
+\[ T_{1D} = \frac{-q'''(z)r^2}{4k} + \frac{q'''(z)R}{2} + \frac{hq'''R^2}{4k} + hT_{coolant}\]
+
 
 The $C_2$ values obtained with the equation is listed in table \ref{tab:c2}.
 The fuel temperature is plotted in figure \ref{fig:t_f_r}.

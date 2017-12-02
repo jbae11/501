@@ -2,9 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as integrate
 import scipy.special as special
-import scipy.optimize
 from iapws import IAPWS97
-from sympy import *
 
 def fit_poly_cp(order_to):
     """ fits a polynomial for Temp and C_p of Water"""
@@ -20,7 +18,8 @@ def fit_poly_cp(order_to):
         eq = list(reversed(eq))
         print(eq)
         x = np.polynomial.polynomial.Polynomial(eq)
-        integral = integrate.quad(x, 290+273, 325+273)
+        print(x)
+        integral = integrate.quad(x, a=290+273, b=325+273)
         x = list(x)
         x = list(reversed(x))
         print(x)
@@ -47,7 +46,7 @@ def root_solver():
     z = np.linspace(0, 366, 100)
     t_c = []
     for i in z:
-        root = np.roots([-1.47e-6, 0.0025, -1.41, 276.23-np.cos(np.pi * i / 366)])
+        root = np.roots([-1.47e-6, 0.0025, -1.41, 265-np.cos(np.pi * i / 366)])
         print(root)
         print(type(root))
         filtered_root = float(str(root[0])[1:7])
@@ -56,6 +55,15 @@ def root_solver():
     plt.plot(t_c, z)
     plt.show()
 
+def low_key():
+    z = np.linspace(0, 366, 1000)
+    t_c = []
+    for i in z:
+        temp = 18.02*(1-np.cos(np.pi*i/366)) + 563
+        t_c.append(temp)
+
+    plt.plot(z, t_c)
+    plt.show()
 
 def shit():
     z = np.linspace(0, 366, 1000)
@@ -82,6 +90,7 @@ def shit():
     plt.savefig('t_c_z.png', format='png')
     plt.show()
 """
+
 
 def find_tc(z_grid):
     z = np.linspace(0, 366, z_grid)
@@ -119,55 +128,71 @@ def find_h(z_grid):
 
     return h_list
 
-def find_c2():
+def q_vol_z():
+    z = np.linspace(0, 366, 1000)
+    q = 164.1 * np.sin(np.pi*z / 366)
+    plt.plot(z, q)
+    plt.xlabel('Height [cm]')
+    plt.ylabel('Volumetric Heat Generation [W/m^3]')
+    plt.title('Volumetric Heat Generation with Respect to Height')
+    plt.savefig('q_vol_z.png', format='png')
+    plt.show()
+    plt.close()
+
+def four():
+    R = 0.47
+    k = 0.057
+    L = 366
     q_vol_list = [116.03, 164.1, 116.03]
     h_list = [3.591, 3.575, 3.567]
     t_list = [568.22, 581.04, 593.78]
-    L_list = [366/4, 366/2, 366*3/4]
+    L_list = [L/4, L/2, L*3/4]
+    labels = ['L/4', 'L/2', '3L/4']
     for i in range(0, len(h_list)):
-        c_2 = q_vol_list[i] * (4.122/h_list[i] + .96) + t_list[i]
+        c_2 = (q_vol_list[i]*R/2) + q_vol_list[i] * h_list[i] * R**2 /(4*k) + h_list[i] * t_list[i]
         r = np.linspace(0, 0.47, 100)
-        t_r = (-q_vol_list[i]*r**2)/(4*0.057) + c_2
-        plt.plot(r, t_r, label='z = %s cm'%str(L_list[i])[:5])
+        t_r = (-q_vol_list[i]*r**2)/(4*k) + c_2
+        plt.plot(r, t_r, label='z = ' + str(L_list[i])[:5] + ' cm (%s)' %labels[i])
 
     plt.legend()
     plt.xlabel('Radial Distance [cm]')
     plt.ylabel('Fuel Temperature [K]')
-    plt.title('Fuel Temperature vsRadial Distance')
+    plt.title('Fuel Temperature vs Radial Distance')
     plt.savefig('t_f_r.png', format='png')
     plt.show()
-
+    plt.close()
 
 def fuel_rod_temp(z_grid):
     """ temperature distribution in the fuel rod T_f(r,z)"""
 
     # k of UOX at 300C:
-    k = 5.7 
+    k = 0.057 
     change = 10000
-    zee = np.linspace(0,366, z_grid)
-    dz = zee[1]-zee[0]
-    q_vol = 164.1*np.sin(np.pi * zee / 366)
-    ar = np.linspace(0, 0.47, 50)
-    dr = ar[1]-ar[0]
+    z_list = np.linspace(0,366, z_grid)
+    dz = z_list[1]-z_list[0]
+    q_vol = 164.1*np.sin(np.pi * z_list / 366)
+    r_list = np.linspace(0, 0.47, 50)
+    dr = r_list[1]-r_list[0]
     h = find_h(z_grid)
     t_c = find_tc(z_grid)
-    print(h)
-    print(t_c)
-    print(q_vol)
-    t = np.zeros(shape=(len(zee),len(ar)), dtype=float)
+
+    # 2d matrix with len(z) columns and len(r) rows
+    t = np.zeros(shape=(len(z_list),len(r_list)), dtype=float)
+    print(len(t))
+    print(len(t[0]))
     # insulated bc at z=0 and z=L
     # convective bc at r = 0.47
     # r=0 bc
 
-    trold = np.zeros(len(ar))
-    for z in range(2,len(zee)-1):
+    trold = np.zeros(len(r_list))
+    for z in range(2,len(z_list)-1):
         while change > 1e-3:
-            for r in range(2,len(ar)-1):
-                one = - (t[z-1][r] + t[z+1][r])/(dz**2)
-                two = t[z][r-1]/(ar[r] * dr)
-                three = - (t[z][r-1] + t[z][r+1]) / (dr**2)
-                four = - q_vol[z] / k
-                denom = 2/(dz**2) 2/(dr**2) - 1/(ar[r]*dr)
+            for r in range(2,len(r_list)-1):
+                one = (t[z-1][r] + t[z+1][r])/(dz**2)
+                two = (t[z][r+1] - t[z][r-1]) / (r_list[r] * 2*dr)
+                three = (t[z][r-1] + t[z][r+1]) / (dr**2)
+                four = q_vol[z] / k
+                denom = 2/(dz**2) + 2/(dr**2) 
                 t[z][r] = (one + two + three + four) / denom
 
             #convective BC:
@@ -180,6 +205,8 @@ def fuel_rod_temp(z_grid):
             trold = tr
         print('ziteration')
 
+    plt.plot(r_list, t[int(z_grid/4)])
+    plt.show()
 
 
 ########################################################
@@ -193,5 +220,4 @@ def fuel_rod_temp(z_grid):
 ########################################################
 
 ########################################################
-
 fuel_rod_temp(10)
