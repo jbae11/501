@@ -1,0 +1,25 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{analytical\PYGZus{}1d}\PYG{p}{():}
+    \PYG{n}{R} \PYG{o}{=} \PYG{l+m+mf}{0.47}
+    \PYG{n}{k} \PYG{o}{=} \PYG{l+m+mf}{0.04}
+    \PYG{n}{L} \PYG{o}{=} \PYG{l+m+mi}{366}
+    \PYG{n}{q\PYGZus{}vol\PYGZus{}list} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mf}{116.03}\PYG{p}{,} \PYG{l+m+mf}{164.1}\PYG{p}{,} \PYG{l+m+mf}{116.03}\PYG{p}{]}
+    \PYG{n}{h\PYGZus{}list} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mf}{3.591}\PYG{p}{,} \PYG{l+m+mf}{3.575}\PYG{p}{,} \PYG{l+m+mf}{3.567}\PYG{p}{]}
+    \PYG{n}{t\PYGZus{}list} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mf}{568.22}\PYG{p}{,} \PYG{l+m+mf}{581.04}\PYG{p}{,} \PYG{l+m+mf}{593.78}\PYG{p}{]}
+    \PYG{n}{L\PYGZus{}list} \PYG{o}{=} \PYG{p}{[}\PYG{n}{L}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{,} \PYG{n}{L}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{L}\PYG{o}{*}\PYG{l+m+mi}{3}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{]}
+    \PYG{n}{labels} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}L/4\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}L/2\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}3L/4\PYGZsq{}}\PYG{p}{]}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{h\PYGZus{}list}\PYG{p}{)):}
+        \PYG{n}{c\PYGZus{}2} \PYG{o}{=} \PYG{p}{(}\PYG{n}{k}\PYG{o}{/}\PYG{n}{h\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{])} \PYG{o}{*} \PYG{p}{(}\PYG{n}{q\PYGZus{}vol\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{*} \PYG{n}{R} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{k}\PYG{p}{))} \PYG{o}{+} \PYG{n}{q\PYGZus{}vol\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{*} \PYG{p}{(}\PYG{n}{R}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mi}{4}\PYG{o}{*}\PYG{n}{k}\PYG{p}{)} \PYG{o}{+} \PYG{n}{t\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}
+        \PYG{n}{r} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mf}{0.47}\PYG{p}{,} \PYG{l+m+mi}{100}\PYG{p}{)}
+        \PYG{k}{print}\PYG{p}{(}\PYG{n}{c\PYGZus{}2}\PYG{p}{)}
+        \PYG{n}{t\PYGZus{}r} \PYG{o}{=} \PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{q\PYGZus{}vol\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{o}{*}\PYG{n}{r}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mi}{4}\PYG{o}{*}\PYG{n}{k}\PYG{p}{)} \PYG{o}{+} \PYG{n}{c\PYGZus{}2}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,} \PYG{n}{t\PYGZus{}r}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=} \PYG{n}{labels}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{+} \PYG{l+s+s1}{\PYGZsq{} (\PYGZsq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{L\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{])[:}\PYG{l+m+mi}{5}\PYG{p}{]} \PYG{o}{+} \PYG{l+s+s1}{\PYGZsq{} cm)\PYGZsq{}}\PYG{p}{)}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Radial Distance [cm]\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Fuel Temperature [K]\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Fuel Temperature vs Radial Distance\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}t\PYGZus{}f\PYGZus{}r.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}png\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{close}\PYG{p}{()}
+\end{Verbatim}
