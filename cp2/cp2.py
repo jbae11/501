@@ -131,8 +131,11 @@ def find_h(z_grid):
 def q_vol_z():
     z = np.linspace(0, 366, 1000)
     q = 164.1 * np.sin(np.pi*z / 366)
-    plt.plot(z, q)
+    plt.plot(z, q, label='Polynomial Fit')
+    q = 159.34 * np.sin(np.pi*z / 366)
+    plt.plot(z, q, label='Constant C_p')    
     plt.xlabel('Height [cm]')
+    plt.legend()
     plt.ylabel('Volumetric Heat Generation [W/m^3]')
     plt.title('Volumetric Heat Generation with Respect to Height')
     plt.savefig('q_vol_z.png', format='png')
@@ -141,7 +144,7 @@ def q_vol_z():
 
 def four():
     R = 0.47
-    k = 0.057
+    k = 0.04
     L = 366
     q_vol_list = [116.03, 164.1, 116.03]
     h_list = [3.591, 3.575, 3.567]
@@ -169,7 +172,7 @@ def fuel_rod_temp(z_grid):
     tol = 1e-3
 
     # k of UOX at 300C:
-    k = 0.057 
+    k = 0.04 
     change = 10000
     z_list = np.linspace(0,366, z_grid)
     dz = z_list[1]-z_list[0]
@@ -240,6 +243,10 @@ def fuel_rod_temp(z_grid):
 
     plt.plot(r_list, t[int(3*z_grid/4)], label='3L/4')
     plt.legend()
+    plt.xlabel('Radial Distance [cm]')
+    plt.ylabel('Fuel Temperature [K]')
+    plt.title('Fuel Temperature vs Radial Distance')
+    plt.savefig('numerical.png', format='png')
     plt.show()
 
 
@@ -254,4 +261,6 @@ def fuel_rod_temp(z_grid):
 ########################################################
 
 ########################################################
-fuel_rod_temp(10)
+four()
+q_vol_z()
+fuel_rod_temp(20)

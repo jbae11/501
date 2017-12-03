@@ -97,7 +97,7 @@
        \hline
        Water Density & 0.6982 & $\frac{g}{cm^3}$ \\
        Specific Heat & 5.650 & $\frac{J}{g\cdot K}$ \\
-       Thermal Conductivity & 0.591 & $\frac{J}{s\cdot m\cdot k}$ \\       
+       Thermal Conductivity ($UO_2$) & 0.4 \cite{ronchi_thermal_1999} & $\frac{J}{s\cdot m\cdot k}$ \\       
        \hline
     \end{tabular}
     \caption {Problem Constants.}
@@ -153,15 +153,6 @@ module \cite{romera_iapws:_2017}. The $C_p$ values
 in the range are acquired and fitted using
 the polyfit function in the numpy module.
 
-First, fitting a fifth-order polynomial we get:
-
-\[C_p = 2.31e-09 T^5 -6.5e-6 T^4 +7.41e-3 T^3 -4.202 T^2 1.1918e3 T -1.35e5e-9\]
-
-Considering the last three terms are minute, we reduce the 
-number of orders for the polynomial fit. Fitting a second-order
-polynomial fit we get:
-
-\[C_p = 4.67e-4T^2 -5.1e-1T + 144\]
 
 The process of looking for an `appropriate' order fit was automated
 by a python code (in appendix). The results are organized in table \ref{tab:poly_fit} as well as plotted in figure \ref{fig:poly_fit}.
@@ -180,7 +171,7 @@ by a python code (in appendix). The results are organized in table \ref{tab:poly
        5 & 164.22 \\
        \hline
     \end{tabular}
-    \caption {Polynomial Fit Order and $C_p dT$ Value.}
+    \caption {Polynomial Fit Order and C Value.}
     \label{tab:poly_fit}
 \end{table}
 
@@ -192,6 +183,12 @@ by a python code (in appendix). The results are organized in table \ref{tab:poly
     \caption{Temperature vs Heat Capacity from 563K to 598K}
     \label{fig:poly_fit}
 \end{figure}
+
+
+Considering the last three terms have little difference, we 
+fit a second-order polynomial to obtain:
+
+\[C_p = 4.67e-4T^2 -5.1e-1T + 144\]
 
 Thus, using the second order polynomial fit, the volumetric
 and linear heat generation becomes:
@@ -331,7 +328,8 @@ Ignoring Axial Conduction, we get:
 
 q'''(z) and $T_c$, and h  values for z values L/4, L/2, 3L/4 are listed in table \ref{tab:q_vol}.
 The values are obtained from previous problems, and using a script (in appendix).
-The value of thermal conductivity of uranium oxide is from \cite{ronchi_thermal_1999}.
+The value of thermal conductivity of uranium oxide is assumed
+to be 0.4.\cite{ronchi_thermal_1999}.
 
 \begin{table}[h]
      \centering

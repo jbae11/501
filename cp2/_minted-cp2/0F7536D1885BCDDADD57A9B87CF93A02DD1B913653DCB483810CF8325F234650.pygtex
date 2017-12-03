@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYGdefault{k}{def} \PYGdefault{n+nf}{find\PYGdefaultZus{}h}\PYGdefault{p}{():}
+    \PYGdefault{n}{ri} \PYGdefault{o}{=} \PYGdefault{l+m+mf}{0.47}
+    \PYGdefault{n}{ro} \PYGdefault{o}{=} \PYGdefault{l+m+mf}{0.625}
+    \PYGdefault{n}{v} \PYGdefault{o}{=} \PYGdefault{l+m+mi}{350}
+    \PYGdefault{k}{for} \PYGdefault{n}{i} \PYGdefault{o+ow}{in} \PYGdefault{p}{[}\PYGdefault{l+m+mf}{568.2}\PYGdefault{p}{,} \PYGdefault{l+m+mf}{581.04}\PYGdefault{p}{,} \PYGdefault{l+m+mf}{593.78}\PYGdefault{p}{]:}
+        \PYGdefault{n}{L} \PYGdefault{o}{=} \PYGdefault{l+m+mi}{4} \PYGdefault{o}{*} \PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{pi}\PYGdefault{o}{*}\PYGdefault{p}{(}\PYGdefault{n}{ro}\PYGdefault{o}{**}\PYGdefault{l+m+mi}{2} \PYGdefault{o}{\PYGdefaultZhy{}} \PYGdefault{n}{ri}\PYGdefault{o}{**}\PYGdefault{l+m+mi}{2}\PYGdefault{p}{)} \PYGdefault{o}{/} \PYGdefault{p}{(}\PYGdefault{l+m+mi}{2}\PYGdefault{o}{*}\PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{pi}\PYGdefault{o}{*}\PYGdefault{n}{ro} \PYGdefault{o}{+} \PYGdefault{l+m+mi}{2}\PYGdefault{o}{*}\PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{pi}\PYGdefault{o}{*}\PYGdefault{n}{ri}\PYGdefault{p}{)}
+        \PYGdefault{n}{mu} \PYGdefault{o}{=} \PYGdefault{n}{IAPWS97}\PYGdefault{p}{(}\PYGdefault{n}{T}\PYGdefault{o}{=}\PYGdefault{n}{i}\PYGdefault{p}{,} \PYGdefault{n}{P}\PYGdefault{o}{=}\PYGdefault{l+m+mf}{15.17}\PYGdefault{p}{)}\PYGdefault{o}{.}\PYGdefault{n}{mu} \PYGdefault{o}{*} \PYGdefault{l+m+mi}{10}
+        \PYGdefault{n}{rho} \PYGdefault{o}{=} \PYGdefault{n}{IAPWS97}\PYGdefault{p}{(}\PYGdefault{n}{T}\PYGdefault{o}{=}\PYGdefault{n}{i}\PYGdefault{p}{,} \PYGdefault{n}{P}\PYGdefault{o}{=}\PYGdefault{l+m+mf}{15.17}\PYGdefault{p}{)}\PYGdefault{o}{.}\PYGdefault{n}{rho} \PYGdefault{o}{/}\PYGdefault{l+m+mi}{1000}
+        \PYGdefault{n}{cp} \PYGdefault{o}{=} \PYGdefault{n}{IAPWS97}\PYGdefault{p}{(}\PYGdefault{n}{T}\PYGdefault{o}{=}\PYGdefault{n}{i}\PYGdefault{p}{,} \PYGdefault{n}{P}\PYGdefault{o}{=}\PYGdefault{l+m+mf}{15.17}\PYGdefault{p}{)}\PYGdefault{o}{.}\PYGdefault{n}{cp}
+        \PYGdefault{n}{k} \PYGdefault{o}{=} \PYGdefault{n}{IAPWS97}\PYGdefault{p}{(}\PYGdefault{n}{T}\PYGdefault{o}{=}\PYGdefault{n}{i}\PYGdefault{p}{,} \PYGdefault{n}{P}\PYGdefault{o}{=}\PYGdefault{l+m+mf}{15.17}\PYGdefault{p}{)}\PYGdefault{o}{.}\PYGdefault{n}{k} \PYGdefault{o}{/}\PYGdefault{l+m+mi}{100}
+        \PYGdefault{n}{Re} \PYGdefault{o}{=} \PYGdefault{n}{rho}\PYGdefault{o}{*}\PYGdefault{n}{v}\PYGdefault{o}{*}\PYGdefault{n}{L} \PYGdefault{o}{/} \PYGdefault{n}{mu}
+        \PYGdefault{n}{Pr} \PYGdefault{o}{=} \PYGdefault{n}{mu}\PYGdefault{o}{*}\PYGdefault{n}{cp} \PYGdefault{o}{/} \PYGdefault{n}{k}
+        \PYGdefault{n}{Nu} \PYGdefault{o}{=} \PYGdefault{l+m+mf}{0.023} \PYGdefault{o}{*} \PYGdefault{n}{Re}\PYGdefault{o}{**}\PYGdefault{p}{(}\PYGdefault{l+m+mf}{0.8}\PYGdefault{p}{)} \PYGdefault{o}{*} \PYGdefault{n}{Pr}\PYGdefault{o}{**}\PYGdefault{p}{(}\PYGdefault{l+m+mf}{0.4}\PYGdefault{p}{)}
+        \PYGdefault{n}{h} \PYGdefault{o}{=} \PYGdefault{n}{Nu} \PYGdefault{o}{*} \PYGdefault{n}{k} \PYGdefault{o}{/} \PYGdefault{n}{L}
+        \PYGdefault{k}{print}\PYGdefault{p}{(}\PYGdefault{n}{h}\PYGdefault{p}{)}
+        \PYGdefault{k}{print}\PYGdefault{p}{(}\PYGdefault{l+s+s1}{\PYGdefaultZsq{}}\PYGdefault{l+s+se}{\PYGdefaultZbs{}n}\PYGdefault{l+s+s1}{\PYGdefaultZsq{}}\PYGdefault{p}{)}
+\end{Verbatim}
