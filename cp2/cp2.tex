@@ -317,14 +317,32 @@ standard follows Python.
     \item $\frac{u[-2][r] - u[-1][r]}{dz} = 0 $
 \end{enumerate}
 
+Using the finite difference approximations, and the boundary conditions,
+the temperature profile is found (code in Appendix) and plotted in figure \ref{fig:numer}
+and \ref{fig:numer2}.
 
+\begin{figure}[htbp!]
+    \begin{center}
+        \includegraphics[scale=0.7]{numerical.png}
+    \end{center}
+    \caption{Temperature of Fuel with respect to r for different z values found using finite difference method.}
+    \label{fig:numer}
+\end{figure}
+
+\begin{figure}[htbp!]
+    \begin{center}
+        \includegraphics[scale=0.7]{numerical2.png}
+    \end{center}
+    \caption{Temperature of Fuel with respect to z for the center and edge found using finite difference method.}
+    \label{fig:numer2}
+\end{figure}
 
 
 \section*{Analytically Solve 1D Fuel Temperature Profile}
 Ignoring Axial Conduction, we get:
 
-\[\frac{1}{r} \frac{d}{dr} (r \frac{d^T}{dr}) = \frac{-q'''(z)}{k}\]
-\[k = 0.057 \frac{W}{cm\cdot K}\]
+\[\frac{1}{r} \frac{d}{dr} (r \frac{dT}{dr}) = \frac{-q'''(z)}{k}\]
+\[k = 0.04 \frac{W}{cm\cdot K}\]
 
 q'''(z) and $T_c$, and h  values for z values L/4, L/2, 3L/4 are listed in table \ref{tab:q_vol}.
 The values are obtained from previous problems, and using a script (in appendix).
@@ -358,15 +376,15 @@ Integrating the differential equation to obtain the temperature profile for the
 Applying BC at r=0, $C_1$ = 0.
 Applying convective BC:
 \[ -k \frac{dT}{dr}(r= 0.47 cm) = h (T(r = 0.47 cm ) - T_{coolant})\]
-\[ k( \frac{q'''R}{2k}) = h (\frac{-q'''R^2}{4k} + C_2 + T_{coolant})\]
+\[ -k( \frac{q''' (.47)}{2k}) = h (\frac{-q'''(.47)^2}{4k} + C_2 - T_{coolant})\]
 This makes:
-\[C_2 = \frac{q'''R}{2} + \frac{hq'''R^2}{4k} + hT_{coolant}\]
+\[C_2 = \frac{-k}{h} ( \frac{-q''' (0.47)}{2k}) + \frac{q''' (.47^2)}{4k} + T_{coolant}\]
 
-\[ T_{1D} = \frac{-q'''(z)r^2}{4k} + \frac{q'''(z)R}{2} + \frac{hq'''R^2}{4k} + hT_{coolant}\]
+\[ T_{1D} = \frac{-q'''(z)r^2}{4k} + \frac{-k}{h} ( \frac{-q''' (0.47)}{2k}) + \frac{q''' (.47^2)}{4k} + T_{coolant}\]
 
 
 The $C_2$ values obtained with the equation is listed in table \ref{tab:c2}.
-The fuel temperature is plotted in figure \ref{fig:t_f_r}.
+The fuel temperature is plotted with the numerical solution in figure \ref{fig:num_anal}.
 
 \begin{table}[h]
      \centering
@@ -374,9 +392,9 @@ The fuel temperature is plotted in figure \ref{fig:t_f_r}.
        \hline
        z value & $C_2$ & equation \\
        \hline
-       L/4 & 323.6  & $T_{1D} = -\frac{-q'''(z)r^2}{4k} + 323.6$ \\
-       L/2 & 234.29 & $T_{1D} = -\frac{-q'''(z)r^2}{4k} + 234.29$ \\
-       3L/4 & 348.30 & $T_{1D} = -\frac{-q'''(z)r^2}{4k} + 348.3$\\
+       L/4 & 323.6  & $T_{1D} = \frac{-q'''(z)r^2}{4k} + 736.0$ \\
+       L/2 & 234.29 & $T_{1D} = \frac{-q'''(z)r^2}{4k} + 818.38$ \\
+       3L/4 & 348.30 & $T_{1D} = \frac{-q'''(z)r^2}{4k} + 761.61$\\
        \hline
     \end{tabular}
     \caption {$C_2$ value for different z values}
@@ -386,10 +404,11 @@ The fuel temperature is plotted in figure \ref{fig:t_f_r}.
 
 \begin{figure}[htbp!]
     \begin{center}
-        \includegraphics[scale=0.7]{t_f_r.png}
+        \includegraphics[scale=0.7]{num_anal.png}
     \end{center}
-    \caption{Temperature of Fuel with respect to r for different z values.}
-    \label{fig:t_f_r}
+    \caption{Temperature of Fuel with respect to r for different z values obtained
+             using both numerical and simplified analytical solution.}
+    \label{fig:num_anal}
 \end{figure}
 
 \section*{Varying Density with temperature}
@@ -500,7 +519,136 @@ def find_h():
 \end{minted}
 
 
+\section{Numerical Method for finding Temperature Profile}
+\begin{minted}{python}
+def fuel_rod_temp(z_grid):
+    """ temperature distribution in the fuel rod T_f(r,z)"""
+
+
+    tol = 1e-3
+    # k of UOX at 300C:
+    k = 0.04 
+    change = 10000
+    z_list = np.linspace(0,366, z_grid)
+    dz = z_list[1]-z_list[0]
+    q_vol = 164.1*np.sin(np.pi * z_list / 366)
+    r_list = np.linspace(0, 0.47, 100)
+    dr = r_list[1]-r_list[0]
+    h = find_h(z_grid)
+    t_c = find_tc(z_grid)
+
+    # 2d matrix with len(z) columns and len(r) rows
+    t = np.zeros(shape=(len(z_list),len(r_list)), dtype=float)
+    print(len(t))
+    print(len(t[0]))
+    # insulated bc at z=0 and z=L
+    # convective bc at r = 0.47
+    # r=0 bc
+
+    trold = np.zeros(len(r_list))
+    while True:
+        told = np.copy(t)
+        for z in range(1,len(z_list)-1):
+            while True:
+                tr = t[z][:]
+                trold = tr.copy()
+                for r in range(1,len(r_list)-1):
+                    # z BC at the end
+                    if z == len(z_list):
+                        one = (2*t[z-1][r])/(dz**2)
+                        two = (t[z][r+1] - t[z][r-1]) / (r_list[r] * 2*dr)
+                        three = (t[z][r-1] + t[z][r+1]) / (dr**2)
+                        four = q_vol[z] / k
+                        denom = 2/(dz**2) + 2/(dr**2) 
+                    # z BC at the beginning
+                    elif z == 0:
+                        one = (2*t[z+1][r])/(dz**2)
+                        two = (t[z][r+1] - t[z][r-1]) / (r_list[r] * 2*dr)
+                        three = (t[z][r-1] + t[z][r+1]) / (dr**2)
+                        four = q_vol[z] / k
+                        denom = 2/(dz**2) + 2/(dr**2) 
+                    # all other scenarios
+                    else:
+                        one = (2*t[z+1][r])/(dz**2)
+                        two = (t[z][r+1] - t[z][r-1]) / (r_list[r] * 2*dr)
+                        three = (t[z][r-1] + t[z][r+1]) / (dr**2)
+                        four = q_vol[z] / k
+                        denom = 2/(dz**2) + 2/(dr**2) 
+
+                    # do the addition to find t[z][r]
+                    t[z][r] = (one + two + three + four) / denom
+                # BC at r=0
+                t[z][0] = t[z][1]
+                #convective BC:
+                t[z][-1] = (t[z][-2] + dr* (h[z]/k) * t_c[z]) / (1+ dr*h[z]/k)
+                # (-h[z] * t_c[z] - (k*t[z][-2]/dr)) / (k/dr - h[z])
+                conv = abs(tr-trold)
+                if max(conv) < tol:
+                    break
+
+        conver = np.abs(t-told)
+        if np.max(conver) < tol:
+            break
+
+    # constant z, varying r
+    plt.plot(r_list, t[int(z_grid/4)], label='L/4 (%s cm)' %str(366/4))
+
+    plt.plot(r_list, t[int(z_grid/2)], label='L/2 (%s cm)' %str(366/2))
+
+    plt.plot(r_list, t[int(3*z_grid/4)], label='3L/4 (%s cm)' %str(3*366/4))
+    plt.legend()
+    plt.xlabel('Radial Distance [cm]')
+    plt.ylabel('Fuel Temperature [K]')
+    plt.title('Fuel Temperature vs Radial Distance')
+    plt.savefig('numerical.png', format='png')
+    plt.show()
+    plt.close()
+
+
+    # constant r, varying z
+    plt.plot(t[:,0][1:-2], z_list[1:-2], label='r = 0')
+    plt.plot(t[:,-1][1:-2], z_list[1:-2], label='r = R')
+    plt.plot(t_c, z_list, label = 'Coolant Temperature')
+
+    plt.legend()
+    plt.xlabel('Temperature [K]')
+    plt.ylabel('Height [cm]')
+    plt.title('Temperature vs Height')
+    plt.savefig('numerical2.png', format='png')
+    plt.show()
+    plt.close()
+
+    # numerical and analytical together for varying r, constant z
+    plt.plot(r_list, t[int(z_grid/4)], label='Numerical: L/4 (%s cm)' %str(366/4))
+    plt.plot(r_list, t[int(z_grid/2)], label='Numerical: L/2 (%s cm)' %str(366/2))
+    plt.plot(r_list, t[int(3*z_grid/4)], label='Numerical: 3L/4 (%s cm)' %str(3*366/4))
+
+    R = 0.47
+    k = 0.04
+    L = 366
+    q_vol_list = [116.03, 164.1, 116.03]
+    h_list = [3.591, 3.575, 3.567]
+    t_list = [568.22, 581.04, 593.78]
+    L_list = [L/4, L/2, L*3/4]
+    labels = ['L/4', 'L/2', '3L/4']
+    for i in range(0, len(h_list)):
+        c_2 = (k/h_list[i]) * (q_vol_list[i] * R / (2*k)) + q_vol_list[i] * (R**2)/(4*k) + t_list[i]
+        r = np.linspace(0, 0.47, 100)
+        print(c_2)
+        t_r = (-q_vol_list[i]*r**2)/(4*k) + c_2
+        plt.plot(r, t_r, marker='1', label= ' Analytical: ' + labels[i] + ' (' + str(L_list[i])[:5] + ' cm)')
+    
+    plt.legend()
+    plt.xlabel('Radial Distance [cm]')
+    plt.ylabel('Fuel Temperature [K]')
+    plt.title('Fuel Temperature vs Radial Distance')
+    plt.savefig('num_anal.png', format='png')
+    plt.show()
+    plt.close()
+
+\end{minted}
 \end{appendices}
+
 \pagebreak
 
 -end of report.

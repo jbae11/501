@@ -152,10 +152,11 @@ def four():
     L_list = [L/4, L/2, L*3/4]
     labels = ['L/4', 'L/2', '3L/4']
     for i in range(0, len(h_list)):
-        c_2 = (q_vol_list[i]*R/2) + q_vol_list[i] * h_list[i] * R**2 /(4*k) + h_list[i] * t_list[i]
+        c_2 = (k/h_list[i]) * (q_vol_list[i] * R / (2*k)) + q_vol_list[i] * (R**2)/(4*k) + t_list[i]
         r = np.linspace(0, 0.47, 100)
+        print(c_2)
         t_r = (-q_vol_list[i]*r**2)/(4*k) + c_2
-        plt.plot(r, t_r, label='z = ' + str(L_list[i])[:5] + ' cm (%s)' %labels[i])
+        plt.plot(r, t_r, label= labels[i] + ' (' + str(L_list[i])[:5] + ' cm)')
 
     plt.legend()
     plt.xlabel('Radial Distance [cm]')
@@ -170,14 +171,13 @@ def fuel_rod_temp(z_grid):
 
 
     tol = 1e-3
-
     # k of UOX at 300C:
     k = 0.04 
     change = 10000
     z_list = np.linspace(0,366, z_grid)
     dz = z_list[1]-z_list[0]
     q_vol = 164.1*np.sin(np.pi * z_list / 366)
-    r_list = np.linspace(0, 0.47, 50)
+    r_list = np.linspace(0, 0.47, 100)
     dr = r_list[1]-r_list[0]
     h = find_h(z_grid)
     t_c = find_tc(z_grid)
@@ -227,7 +227,6 @@ def fuel_rod_temp(z_grid):
                 #convective BC:
                 t[z][-1] = (t[z][-2] + dr* (h[z]/k) * t_c[z]) / (1+ dr*h[z]/k)
                 # (-h[z] * t_c[z] - (k*t[z][-2]/dr)) / (k/dr - h[z])
-                print('iteration')
                 conv = abs(tr-trold)
                 if max(conv) < tol:
                     break
@@ -235,19 +234,62 @@ def fuel_rod_temp(z_grid):
         conver = np.abs(t-told)
         if np.max(conver) < tol:
             break
-        print('ziteration')
 
-    plt.plot(r_list, t[int(z_grid/4)], label='L/4')
+    # constant z, varying r
+    plt.plot(r_list, t[int(z_grid/4)], label='L/4 (%s cm)' %str(366/4))
 
-    plt.plot(r_list, t[int(z_grid/2)], label='L/2')
+    plt.plot(r_list, t[int(z_grid/2)], label='L/2 (%s cm)' %str(366/2))
 
-    plt.plot(r_list, t[int(3*z_grid/4)], label='3L/4')
+    plt.plot(r_list, t[int(3*z_grid/4)], label='3L/4 (%s cm)' %str(3*366/4))
     plt.legend()
     plt.xlabel('Radial Distance [cm]')
     plt.ylabel('Fuel Temperature [K]')
     plt.title('Fuel Temperature vs Radial Distance')
     plt.savefig('numerical.png', format='png')
     plt.show()
+    plt.close()
+
+
+    # constant r, varying z
+    plt.plot(t[:,0][1:-2], z_list[1:-2], label='r = 0')
+    plt.plot(t[:,-1][1:-2], z_list[1:-2], label='r = R')
+    plt.plot(t_c, z_list, label = 'Coolant Temperature')
+
+    plt.legend()
+    plt.xlabel('Temperature [K]')
+    plt.ylabel('Height [cm]')
+    plt.title('Temperature vs Height')
+    plt.savefig('numerical2.png', format='png')
+    plt.show()
+    plt.close()
+
+    # numerical and analytical together for varying r, constant z
+    plt.plot(r_list, t[int(z_grid/4)], label='Numerical: L/4 (%s cm)' %str(366/4))
+    plt.plot(r_list, t[int(z_grid/2)], label='Numerical: L/2 (%s cm)' %str(366/2))
+    plt.plot(r_list, t[int(3*z_grid/4)], label='Numerical: 3L/4 (%s cm)' %str(3*366/4))
+
+    R = 0.47
+    k = 0.04
+    L = 366
+    q_vol_list = [116.03, 164.1, 116.03]
+    h_list = [3.591, 3.575, 3.567]
+    t_list = [568.22, 581.04, 593.78]
+    L_list = [L/4, L/2, L*3/4]
+    labels = ['L/4', 'L/2', '3L/4']
+    for i in range(0, len(h_list)):
+        c_2 = (k/h_list[i]) * (q_vol_list[i] * R / (2*k)) + q_vol_list[i] * (R**2)/(4*k) + t_list[i]
+        r = np.linspace(0, 0.47, 100)
+        print(c_2)
+        t_r = (-q_vol_list[i]*r**2)/(4*k) + c_2
+        plt.plot(r, t_r, marker='1', label= ' Analytical: ' + labels[i] + ' (' + str(L_list[i])[:5] + ' cm)')
+    
+    plt.legend()
+    plt.xlabel('Radial Distance [cm]')
+    plt.ylabel('Fuel Temperature [K]')
+    plt.title('Fuel Temperature vs Radial Distance')
+    plt.savefig('num_anal.png', format='png')
+    plt.show()
+    plt.close()
 
 
 ########################################################
@@ -261,6 +303,6 @@ def fuel_rod_temp(z_grid):
 ########################################################
 
 ########################################################
-four()
-q_vol_z()
-fuel_rod_temp(20)
+#four()
+#q_vol_z()
+fuel_rod_temp(50)
