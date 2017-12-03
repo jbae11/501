@@ -1,0 +1,126 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{fuel\PYGZus{}rod\PYGZus{}temp}\PYG{p}{(}\PYG{n}{z\PYGZus{}grid}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{} temperature distribution in the fuel rod T\PYGZus{}f(r,z)\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+
+    \PYG{n}{tol} \PYG{o}{=} \PYG{l+m+mf}{1e\PYGZhy{}3}
+    \PYG{c+c1}{\PYGZsh{} k of UOX at 300C:}
+    \PYG{n}{k} \PYG{o}{=} \PYG{l+m+mf}{0.04}
+    \PYG{n}{change} \PYG{o}{=} \PYG{l+m+mi}{10000}
+    \PYG{n}{z\PYGZus{}list} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{366}\PYG{p}{,} \PYG{n}{z\PYGZus{}grid}\PYG{p}{)}
+    \PYG{n}{dz} \PYG{o}{=} \PYG{n}{z\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{z\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+    \PYG{n}{q\PYGZus{}vol} \PYG{o}{=} \PYG{l+m+mf}{164.1}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{sin}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi} \PYG{o}{*} \PYG{n}{z\PYGZus{}list} \PYG{o}{/} \PYG{l+m+mi}{366}\PYG{p}{)}
+    \PYG{n}{r\PYGZus{}list} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mf}{0.47}\PYG{p}{,} \PYG{l+m+mi}{100}\PYG{p}{)}
+    \PYG{n}{dr} \PYG{o}{=} \PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+    \PYG{n}{h} \PYG{o}{=} \PYG{n}{find\PYGZus{}h}\PYG{p}{(}\PYG{n}{z\PYGZus{}grid}\PYG{p}{)}
+    \PYG{n}{t\PYGZus{}c} \PYG{o}{=} \PYG{n}{find\PYGZus{}tc}\PYG{p}{(}\PYG{n}{z\PYGZus{}grid}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} 2d matrix with len(z) columns and len(r) rows}
+    \PYG{n}{t} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{shape}\PYG{o}{=}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{z\PYGZus{}list}\PYG{p}{),}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{)),} \PYG{n}{dtype}\PYG{o}{=}\PYG{n+nb}{float}\PYG{p}{)}
+    \PYG{k}{print}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{t}\PYG{p}{))}
+    \PYG{k}{print}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{t}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]))}
+    \PYG{c+c1}{\PYGZsh{} insulated bc at z=0 and z=L}
+    \PYG{c+c1}{\PYGZsh{} convective bc at r = 0.47}
+    \PYG{c+c1}{\PYGZsh{} r=0 bc}
+
+    \PYG{n}{trold} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{))}
+    \PYG{k}{while} \PYG{n+nb+bp}{True}\PYG{p}{:}
+        \PYG{n}{told} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{copy}\PYG{p}{(}\PYG{n}{t}\PYG{p}{)}
+        \PYG{k}{for} \PYG{n}{z} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{z\PYGZus{}list}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{):}
+            \PYG{k}{while} \PYG{n+nb+bp}{True}\PYG{p}{:}
+                \PYG{n}{tr} \PYG{o}{=} \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][:]}
+                \PYG{n}{trold} \PYG{o}{=} \PYG{n}{tr}\PYG{o}{.}\PYG{n}{copy}\PYG{p}{()}
+                \PYG{k}{for} \PYG{n}{r} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{):}
+                    \PYG{c+c1}{\PYGZsh{} z BC at the end}
+                    \PYG{k}{if} \PYG{n}{z} \PYG{o}{==} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{z\PYGZus{}list}\PYG{p}{):}
+                        \PYG{n}{one} \PYG{o}{=} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{n}{r}\PYG{p}{])}\PYG{o}{/}\PYG{p}{(}\PYG{n}{dz}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+                        \PYG{n}{two} \PYG{o}{=} \PYG{p}{(}\PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o}{/} \PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]} \PYG{o}{*} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{dr}\PYG{p}{)}
+                        \PYG{n}{three} \PYG{o}{=} \PYG{p}{(}\PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{+} \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o}{/} \PYG{p}{(}\PYG{n}{dr}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+                        \PYG{n}{four} \PYG{o}{=} \PYG{n}{q\PYGZus{}vol}\PYG{p}{[}\PYG{n}{z}\PYG{p}{]} \PYG{o}{/} \PYG{n}{k}
+                        \PYG{n}{denom} \PYG{o}{=} \PYG{l+m+mi}{2}\PYG{o}{/}\PYG{p}{(}\PYG{n}{dz}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mi}{2}\PYG{o}{/}\PYG{p}{(}\PYG{n}{dr}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+                    \PYG{c+c1}{\PYGZsh{} z BC at the beginning}
+                    \PYG{k}{elif} \PYG{n}{z} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{:}
+                        \PYG{n}{one} \PYG{o}{=} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{n}{r}\PYG{p}{])}\PYG{o}{/}\PYG{p}{(}\PYG{n}{dz}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+                        \PYG{n}{two} \PYG{o}{=} \PYG{p}{(}\PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o}{/} \PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]} \PYG{o}{*} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{dr}\PYG{p}{)}
+                        \PYG{n}{three} \PYG{o}{=} \PYG{p}{(}\PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{+} \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o}{/} \PYG{p}{(}\PYG{n}{dr}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+                        \PYG{n}{four} \PYG{o}{=} \PYG{n}{q\PYGZus{}vol}\PYG{p}{[}\PYG{n}{z}\PYG{p}{]} \PYG{o}{/} \PYG{n}{k}
+                        \PYG{n}{denom} \PYG{o}{=} \PYG{l+m+mi}{2}\PYG{o}{/}\PYG{p}{(}\PYG{n}{dz}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mi}{2}\PYG{o}{/}\PYG{p}{(}\PYG{n}{dr}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+                    \PYG{c+c1}{\PYGZsh{} all other scenarios}
+                    \PYG{k}{else}\PYG{p}{:}
+                        \PYG{n}{one} \PYG{o}{=} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{n}{r}\PYG{p}{])}\PYG{o}{/}\PYG{p}{(}\PYG{n}{dz}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+                        \PYG{n}{two} \PYG{o}{=} \PYG{p}{(}\PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o}{/} \PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]} \PYG{o}{*} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{dr}\PYG{p}{)}
+                        \PYG{n}{three} \PYG{o}{=} \PYG{p}{(}\PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{+} \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o}{/} \PYG{p}{(}\PYG{n}{dr}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+                        \PYG{n}{four} \PYG{o}{=} \PYG{n}{q\PYGZus{}vol}\PYG{p}{[}\PYG{n}{z}\PYG{p}{]} \PYG{o}{/} \PYG{n}{k}
+                        \PYG{n}{denom} \PYG{o}{=} \PYG{l+m+mi}{2}\PYG{o}{/}\PYG{p}{(}\PYG{n}{dz}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mi}{2}\PYG{o}{/}\PYG{p}{(}\PYG{n}{dr}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+
+                    \PYG{c+c1}{\PYGZsh{} do the addition to find t[z][r]}
+                    \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{n}{r}\PYG{p}{]} \PYG{o}{=} \PYG{p}{(}\PYG{n}{one} \PYG{o}{+} \PYG{n}{two} \PYG{o}{+} \PYG{n}{three} \PYG{o}{+} \PYG{n}{four}\PYG{p}{)} \PYG{o}{/} \PYG{n}{denom}
+                \PYG{c+c1}{\PYGZsh{} BC at r=0}
+                \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{=} \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{]}
+                \PYG{c+c1}{\PYGZsh{}convective BC:}
+                \PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{=} \PYG{p}{(}\PYG{n}{t}\PYG{p}{[}\PYG{n}{z}\PYG{p}{][}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{2}\PYG{p}{]} \PYG{o}{+} \PYG{n}{dr}\PYG{o}{*} \PYG{p}{(}\PYG{n}{h}\PYG{p}{[}\PYG{n}{z}\PYG{p}{]}\PYG{o}{/}\PYG{n}{k}\PYG{p}{)} \PYG{o}{*} \PYG{n}{t\PYGZus{}c}\PYG{p}{[}\PYG{n}{z}\PYG{p}{])} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{+} \PYG{n}{dr}\PYG{o}{*}\PYG{n}{h}\PYG{p}{[}\PYG{n}{z}\PYG{p}{]}\PYG{o}{/}\PYG{n}{k}\PYG{p}{)}
+                \PYG{c+c1}{\PYGZsh{} (\PYGZhy{}h[z] * t\PYGZus{}c[z] \PYGZhy{} (k*t[z][\PYGZhy{}2]/dr)) / (k/dr \PYGZhy{} h[z])}
+                \PYG{n}{conv} \PYG{o}{=} \PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{tr}\PYG{o}{\PYGZhy{}}\PYG{n}{trold}\PYG{p}{)}
+                \PYG{k}{if} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{conv}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{n}{tol}\PYG{p}{:}
+                    \PYG{k}{break}
+
+        \PYG{n}{conver} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{t}\PYG{o}{\PYGZhy{}}\PYG{n}{told}\PYG{p}{)}
+        \PYG{k}{if} \PYG{n}{np}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{n}{conver}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{n}{tol}\PYG{p}{:}
+            \PYG{k}{break}
+
+    \PYG{c+c1}{\PYGZsh{} constant z, varying r}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{t}\PYG{p}{[}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{z\PYGZus{}grid}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{)],} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}L/4 (}\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{ cm)\PYGZsq{}} \PYG{o}{\PYGZpc{}}\PYG{n+nb}{str}\PYG{p}{(}\PYG{l+m+mi}{366}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{))}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{t}\PYG{p}{[}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{z\PYGZus{}grid}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{p}{)],} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}L/2 (}\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{ cm)\PYGZsq{}} \PYG{o}{\PYGZpc{}}\PYG{n+nb}{str}\PYG{p}{(}\PYG{l+m+mi}{366}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{p}{))}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{t}\PYG{p}{[}\PYG{n+nb}{int}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{o}{*}\PYG{n}{z\PYGZus{}grid}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{)],} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}3L/4 (}\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{ cm)\PYGZsq{}} \PYG{o}{\PYGZpc{}}\PYG{n+nb}{str}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{o}{*}\PYG{l+m+mi}{366}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{))}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Radial Distance [cm]\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Fuel Temperature [K]\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Fuel Temperature vs Radial Distance\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}numerical.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}png\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{close}\PYG{p}{()}
+
+
+    \PYG{c+c1}{\PYGZsh{} constant r, varying z}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{t}\PYG{p}{[:,}\PYG{l+m+mi}{0}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{2}\PYG{p}{],} \PYG{n}{z\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{2}\PYG{p}{],} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}r = 0\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{t}\PYG{p}{[:,}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{2}\PYG{p}{],} \PYG{n}{z\PYGZus{}list}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{2}\PYG{p}{],} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}r = R\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{t\PYGZus{}c}\PYG{p}{,} \PYG{n}{z\PYGZus{}list}\PYG{p}{,} \PYG{n}{label} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}Coolant Temperature\PYGZsq{}}\PYG{p}{)}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Temperature [K]\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Height [cm]\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Temperature vs Height\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}numerical2.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}png\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{close}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} numerical and analytical together for varying r, constant z}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{t}\PYG{p}{[}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{z\PYGZus{}grid}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{)],} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Numerical: L/4 (}\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{ cm)\PYGZsq{}} \PYG{o}{\PYGZpc{}}\PYG{n+nb}{str}\PYG{p}{(}\PYG{l+m+mi}{366}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{))}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{t}\PYG{p}{[}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{z\PYGZus{}grid}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{p}{)],} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Numerical: L/2 (}\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{ cm)\PYGZsq{}} \PYG{o}{\PYGZpc{}}\PYG{n+nb}{str}\PYG{p}{(}\PYG{l+m+mi}{366}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{p}{))}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r\PYGZus{}list}\PYG{p}{,} \PYG{n}{t}\PYG{p}{[}\PYG{n+nb}{int}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{o}{*}\PYG{n}{z\PYGZus{}grid}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{)],} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Numerical: 3L/4 (}\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{ cm)\PYGZsq{}} \PYG{o}{\PYGZpc{}}\PYG{n+nb}{str}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{o}{*}\PYG{l+m+mi}{366}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{))}
+
+    \PYG{n}{R} \PYG{o}{=} \PYG{l+m+mf}{0.47}
+    \PYG{n}{k} \PYG{o}{=} \PYG{l+m+mf}{0.04}
+    \PYG{n}{L} \PYG{o}{=} \PYG{l+m+mi}{366}
+    \PYG{n}{q\PYGZus{}vol\PYGZus{}list} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mf}{116.03}\PYG{p}{,} \PYG{l+m+mf}{164.1}\PYG{p}{,} \PYG{l+m+mf}{116.03}\PYG{p}{]}
+    \PYG{n}{h\PYGZus{}list} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mf}{3.591}\PYG{p}{,} \PYG{l+m+mf}{3.575}\PYG{p}{,} \PYG{l+m+mf}{3.567}\PYG{p}{]}
+    \PYG{n}{t\PYGZus{}list} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mf}{568.22}\PYG{p}{,} \PYG{l+m+mf}{581.04}\PYG{p}{,} \PYG{l+m+mf}{593.78}\PYG{p}{]}
+    \PYG{n}{L\PYGZus{}list} \PYG{o}{=} \PYG{p}{[}\PYG{n}{L}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{,} \PYG{n}{L}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{L}\PYG{o}{*}\PYG{l+m+mi}{3}\PYG{o}{/}\PYG{l+m+mi}{4}\PYG{p}{]}
+    \PYG{n}{labels} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}L/4\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}L/2\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}3L/4\PYGZsq{}}\PYG{p}{]}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{h\PYGZus{}list}\PYG{p}{)):}
+        \PYG{n}{c\PYGZus{}2} \PYG{o}{=} \PYG{p}{(}\PYG{n}{k}\PYG{o}{/}\PYG{n}{h\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{])} \PYG{o}{*} \PYG{p}{(}\PYG{n}{q\PYGZus{}vol\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{*} \PYG{n}{R} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{k}\PYG{p}{))} \PYG{o}{+} \PYG{n}{q\PYGZus{}vol\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{*} \PYG{p}{(}\PYG{n}{R}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mi}{4}\PYG{o}{*}\PYG{n}{k}\PYG{p}{)} \PYG{o}{+} \PYG{n}{t\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}
+        \PYG{n}{r} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mf}{0.47}\PYG{p}{,} \PYG{l+m+mi}{100}\PYG{p}{)}
+        \PYG{k}{print}\PYG{p}{(}\PYG{n}{c\PYGZus{}2}\PYG{p}{)}
+        \PYG{n}{t\PYGZus{}r} \PYG{o}{=} \PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{q\PYGZus{}vol\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{o}{*}\PYG{n}{r}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mi}{4}\PYG{o}{*}\PYG{n}{k}\PYG{p}{)} \PYG{o}{+} \PYG{n}{c\PYGZus{}2}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,} \PYG{n}{t\PYGZus{}r}\PYG{p}{,} \PYG{n}{marker}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}1\PYGZsq{}}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{} Analytical: \PYGZsq{}} \PYG{o}{+} \PYG{n}{labels}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{+} \PYG{l+s+s1}{\PYGZsq{} (\PYGZsq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{L\PYGZus{}list}\PYG{p}{[}\PYG{n}{i}\PYG{p}{])[:}\PYG{l+m+mi}{5}\PYG{p}{]} \PYG{o}{+} \PYG{l+s+s1}{\PYGZsq{} cm)\PYGZsq{}}\PYG{p}{)}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Radial Distance [cm]\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Fuel Temperature [K]\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Fuel Temperature vs Radial Distance\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}num\PYGZus{}anal.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{format}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}png\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{close}\PYG{p}{()}
+\end{Verbatim}

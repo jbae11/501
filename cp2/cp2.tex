@@ -318,8 +318,13 @@ standard follows Python.
 \end{enumerate}
 
 Using the finite difference approximations, and the boundary conditions,
-the temperature profile is found (code in Appendix) and plotted in figure \ref{fig:numer}
-and \ref{fig:numer2}.
+the radial temperature profile is calculated (code in Appendix) and plotted in figure \ref{fig:numer}.
+The temperature is highest at the center of the fuel (both radially
+and axially) because the generated heat is retained. The L/2 and 3L/4 temperature are
+similar in profile, but has minor difference in magnitude. Note the intersection of
+L/2 and 3L/4, where the temperature drops faster at L/2 because the temperature gradient
+is higher, and since the coolant temperature at 3L/4 is higher, there is less convective
+cooling at the boundaries for 3L/4. 
 
 \begin{figure}[htbp!]
     \begin{center}
@@ -329,14 +334,36 @@ and \ref{fig:numer2}.
     \label{fig:numer}
 \end{figure}
 
+
+The temperature profile with respect to z given r = 0 is shown in figure \ref{fig:numer2}.
+The temperature profile closely follows the heat generation profile, illustrated in
+figure \ref{fig:q_vol}.
+
+
 \begin{figure}[htbp!]
     \begin{center}
-        \includegraphics[scale=0.7]{numerical2.png}
+        \includegraphics[scale=0.7]{fuel_centerline.png}
     \end{center}
-    \caption{Temperature of Fuel with respect to z for the center and edge found using finite difference method.}
+    \caption{Temperature of Fuel centerline with respect to z calculated using finite difference method.}
     \label{fig:numer2}
 \end{figure}
 
+
+The temperature profile with respect to z given r = R and coolant temperature is shown
+in figure \ref{fig:numer3}. Note the temperature at the fuel boundary is larger, intuitively
+so, because heat flows from the fuel to the coolant. Note also the fuel boundary temperature
+decreases towards the top, due to heat generation reduction.
+
+
+\begin{figure}[htbp!]
+    \begin{center}
+        \includegraphics[scale=0.7]{fuel_bound.png}
+    \end{center}
+    \caption{Fuel boundary and coolant temperature with respect to z.}
+    \label{fig:numer3}
+\end{figure}
+
+\pagebreak
 
 \section*{Analytically Solve 1D Fuel Temperature Profile}
 Ignoring Axial Conduction, we get:
@@ -346,8 +373,7 @@ Ignoring Axial Conduction, we get:
 
 q'''(z) and $T_c$, and h  values for z values L/4, L/2, 3L/4 are listed in table \ref{tab:q_vol}.
 The values are obtained from previous problems, and using a script (in appendix).
-The value of thermal conductivity of uranium oxide is assumed
-to be 0.4.\cite{ronchi_thermal_1999}.
+
 
 \begin{table}[h]
      \centering
@@ -411,12 +437,32 @@ The fuel temperature is plotted with the numerical solution in figure \ref{fig:n
     \label{fig:num_anal}
 \end{figure}
 
-\section*{Varying Density with temperature}
+The analytical solution obtained by ignoring axial conduction has
+little difference with the numerical solution that takes into account
+both axial and radial conduction, which means that axial conduction
+has little role in the temperature distribution in the fuel, \textbf{if}
+the two edges (top and bottom) are insulated. This again proves the importance
+of setting an adequate boundary condition to solving differential equations.
+
+\section*{Varying Density with Height}
 Since temperature in the coolant varies with height in the core,
 the density changes as well. The same module used to obtain $C_p$
 is used to obtain the density values \cite{romera_iapws:_2017}.
-Plugging in the temperature value to obtain the density value, we get
-figure \ref{fig:rho_c_z}
+For the range 563K to 598K, it follows a linear trend, as shown
+in figure \ref{fig:wat_den}.  This gives an equation of:
+\[\rho = -0.106T + 60.6384\]
+
+
+\begin{figure}[htbp!]
+    \begin{center}
+        \includegraphics[scale=0.7]{water_density.png}
+    \end{center}
+    \caption{Density of water with respect to temperature, obtained from NIST \cite{acree_phase_?}.}
+    \label{fig:wat_den}
+\end{figure}
+
+Plugging in the temperature value to obtain the density value
+(code in Appendix), we get figure \ref{fig:rho_c_z}.
 
 \begin{figure}[htbp!]
     \begin{center}
@@ -426,31 +472,47 @@ figure \ref{fig:rho_c_z}
     \label{fig:rho_c_z}
 \end{figure}
 
+\section*{Varying Velocity with Height}
+With the mass flow constant, the change in density
+causes the change in velocity. The mass flow rate 
+at the inlet is calculated with known temperature
+563K, with density $0.7446 \frac{g}{cm^3}$.
+An inlet mass flow rate is calculated by:
+\[ \dot{m} = \rho(T) * u * A \]
+\[ \dot{m} = 0.7446 * 350 * \pi * (0.625^2 - 0.47^2) \]
+\[ \dot{m} = 0.7446 * 350 * \pi * (0.625^2 - 0.47^2) \]
+\[ \dot{m} = 138.95 \frac{g}{s}\]
+
+This is then kept constant and the u is varied by varying
+density, caused by varying temperature.
+
+\[ u = \frac{\dot{m}}{\rho * \pi * (0.625^2 - 0.47^2 )}\]
+
+The flow velocity with respect to z is plotted using
+a code (in appendix). The plot is shown in figure \ref{fig:u_c_z}.
+
+\begin{figure}[htbp!]
+    \begin{center}
+        \includegraphics[scale=0.7]{u_c_z.png}
+    \end{center}
+    \caption{Flow velocity with respect to z.}
+    \label{fig:u_c_z}
+\end{figure}
+
+\section*{Discussion of Ignoring Gap and Clad}
+Ignoring the gap and clad allows a more efficient heat transfer
+to the coolant, which leads to a lower fuel temperature. 
+The gap has a low heat transfer coefficient, which `resists' heat
+transfer from the fuel to the coolant, and leads to a higher
+fuel temperature. Without the gap and the clad, the fuel is 
+allowed to more efficiently be cooled by its direct contact
+with the coolant, having a convective boundary condition with
+the coolant directly. Thus the result from this computer project
+does not reflect the reality correctly, due to its assumptions.
+
 
 
 \pagebreak
-Differential Equation:
-
-For water channel ($R_i \leq r \leq R_o$):
-\[\frac{1}{\alpha} \cdot (\frac{dT}{dt} + (V_r \frac{dT}{dr} + V_z \frac{dT}{dz})) =
-  \frac{1}{dr} \frac{d}{dr} (r \frac{dT}{dr}) + \frac{d^2T}{dz^2})\]
-
-For fuel pin ($r < R_i$):
-\[\frac{1}{\alpha} \cdot (\frac{dT}{dt}) =
-  \frac{1}{dr} \frac{d}{dr} (r \frac{dT}{dr}) + \frac{d^2T}{dz^2}) + \frac{q(z)}{k}\]
-
-Boundary Conditions:
-\[-k \frac{dT}{dr}(z=R_o) = 0 \]
-\[\frac{dT}{dr}(r=0) = 0\]
-\[-k \frac{dT}{dz}(z=0) = -k \frac{dT}{dz}(z=L) = 0 \]
- 
-
-Initial Condition:
-\[T(r,0) = \frac{T_0}{2} (1-\cos{(\frac{\pi \cdot r}{R})}) \]
-
-
-
-
 \bibliographystyle{abbrv}
 \bibliography{bibliography}
 \pagebreak
@@ -518,6 +580,7 @@ def find_h():
         print('\n')
 \end{minted}
 
+\section{Find}
 
 \section{Numerical Method for finding Temperature Profile}
 \begin{minted}{python}

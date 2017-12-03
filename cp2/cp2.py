@@ -65,7 +65,7 @@ def low_key():
     plt.plot(z, t_c)
     plt.show()
 
-def shit():
+def rho():
     z = np.linspace(0, 366, 1000)
     t_c = []
     rho_c = []
@@ -82,15 +82,25 @@ def shit():
     plt.savefig('rho_c_z.png', format='png')
     plt.show() 
 
-"""
-    plt.plot(t_c, z)
-    plt.xlabel('Coolant Temperature [K]')
-    plt.ylabel('z [cm]')
-    plt.title('Coolant temperature vs z')
-    plt.savefig('t_c_z.png', format='png')
-    plt.show()
-"""
+def u():
+    z = np.linspace(0, 366, 1000)
+    t_c = []
+    u = []
+    std = 350*0.7446*np.pi*(.625**2-.47**2)
+    for i in z:
+        kewl = 581.02-18.011*np.cos(np.pi*i / 366)
+        t_c.append(kewl)
+        rhoc = IAPWS97(T=kewl, P=15.17).rho /1000
+        print(rhoc)
+        velocity = std / (rhoc*np.pi*(.625**2 - .47**2 ))
+        u.append(velocity)
 
+    plt.plot(u, z)
+    plt.xlabel('Flow Velocity [cm/s]')
+    plt.ylabel('z [cm]')
+    plt.title('Flow Velocity vs z')
+    plt.savefig('u_c_z.png', format='png')
+    plt.show() 
 
 def find_tc(z_grid):
     z = np.linspace(0, 366, z_grid)
@@ -252,14 +262,23 @@ def fuel_rod_temp(z_grid):
 
     # constant r, varying z
     plt.plot(t[:,0][1:-2], z_list[1:-2], label='r = 0')
+    plt.legend()
+    plt.xlabel('Temperature [K]')
+    plt.ylabel('Height [cm]')
+    plt.title('Temperature vs Height at fuel centerline')
+    plt.savefig('fuel_centerline.png', format='png')
+    plt.show()
+    plt.close()
+
+
     plt.plot(t[:,-1][1:-2], z_list[1:-2], label='r = R')
     plt.plot(t_c, z_list, label = 'Coolant Temperature')
 
     plt.legend()
     plt.xlabel('Temperature [K]')
     plt.ylabel('Height [cm]')
-    plt.title('Temperature vs Height')
-    plt.savefig('numerical2.png', format='png')
+    plt.title('Temperature vs Height for coolant and fuel boundary')
+    plt.savefig('fuel_bound.png', format='png')
     plt.show()
     plt.close()
 
@@ -305,4 +324,6 @@ def fuel_rod_temp(z_grid):
 ########################################################
 #four()
 #q_vol_z()
-fuel_rod_temp(50)
+#fuel_rod_temp(50)
+u()
+rho()
