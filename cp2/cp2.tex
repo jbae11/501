@@ -89,7 +89,7 @@
        Fuel Element Pitch & 1.25 & cm \\
        Fuel Element Outer Diameter & 0.94& cm \\
        Pellet-Clad Gap & 0.0082 & cm \\
-       \textbf{Outer us} & 0.625 & cm \\
+       \textbf{Outer Radius} & 0.625 & cm \\
        \textbf{Total Fuel Radius} & 0.47 & cm \\
        \textbf{Active Core Height} & 366 & cm \\
        \hline
@@ -298,8 +298,8 @@ Using the finite difference method, the differential equation becomes,
 
 solving for $u_z^r$:
 
-\[ u_z^r = \frac{u_{z+1}^r + u_{z-1}^r}{dz^2} + \frac{u^{r+1}_z + u^{r-1}_z}{dr^2}
-  + \frac{1}{r} \frac{u^{r+1}_z - u^{r-1}_z}{2dr} + \frac{q_z}{k}\]
+\[ u_z^r = \frac{\frac{u_{z+1}^r + u_{z-1}^r}{dz^2} + \frac{u^{r+1}_z + u^{r-1}_z}{dr^2}
+  + \frac{1}{r} \frac{u^{r+1}_z - u^{r-1}_z}{2dr} + \frac{q_z}{k}}{\frac{2}{dz^2} + \frac{2}{dr^2}} \]
 
 With boundary conditions:
 

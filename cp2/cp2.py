@@ -165,6 +165,9 @@ def four():
 def fuel_rod_temp(z_grid):
     """ temperature distribution in the fuel rod T_f(r,z)"""
 
+
+    tol = 1e-3
+
     # k of UOX at 300C:
     k = 0.057 
     change = 10000
@@ -185,27 +188,58 @@ def fuel_rod_temp(z_grid):
     # r=0 bc
 
     trold = np.zeros(len(r_list))
-    for z in range(2,len(z_list)-1):
-        while change > 1e-3:
-            for r in range(2,len(r_list)-1):
-                one = (t[z-1][r] + t[z+1][r])/(dz**2)
-                two = (t[z][r+1] - t[z][r-1]) / (r_list[r] * 2*dr)
-                three = (t[z][r-1] + t[z][r+1]) / (dr**2)
-                four = q_vol[z] / k
-                denom = 2/(dz**2) + 2/(dr**2) 
-                t[z][r] = (one + two + three + four) / denom
+    while True:
+        told = np.copy(t)
+        for z in range(1,len(z_list)-1):
+            while True:
+                tr = t[z][:]
+                trold = tr.copy()
+                for r in range(1,len(r_list)-1):
+                    # z BC at the end
+                    if z == len(z_list):
+                        one = (2*t[z-1][r])/(dz**2)
+                        two = (t[z][r+1] - t[z][r-1]) / (r_list[r] * 2*dr)
+                        three = (t[z][r-1] + t[z][r+1]) / (dr**2)
+                        four = q_vol[z] / k
+                        denom = 2/(dz**2) + 2/(dr**2) 
+                    # z BC at the beginning
+                    elif z == 0:
+                        one = (2*t[z+1][r])/(dz**2)
+                        two = (t[z][r+1] - t[z][r-1]) / (r_list[r] * 2*dr)
+                        three = (t[z][r-1] + t[z][r+1]) / (dr**2)
+                        four = q_vol[z] / k
+                        denom = 2/(dz**2) + 2/(dr**2) 
+                    # all other scenarios
+                    else:
+                        one = (2*t[z+1][r])/(dz**2)
+                        two = (t[z][r+1] - t[z][r-1]) / (r_list[r] * 2*dr)
+                        three = (t[z][r-1] + t[z][r+1]) / (dr**2)
+                        four = q_vol[z] / k
+                        denom = 2/(dz**2) + 2/(dr**2) 
 
-            #convective BC:
-            t[z][-1] = k*(t[z][-2] - h[z] * t_c[z] * dr) / (k - h[z] * dr)
-            # BC at r=0
-            t[z][0] = t[z][1]
-            tr = t[z][:]
-            print('iteration')
-            change = max(tr-trold)
-            trold = tr
+                    # do the addition to find t[z][r]
+                    t[z][r] = (one + two + three + four) / denom
+                # BC at r=0
+                t[z][0] = t[z][1]
+                #convective BC:
+                t[z][-1] = (t[z][-2] + dr* (h[z]/k) * t_c[z]) / (1+ dr*h[z]/k)
+                # (-h[z] * t_c[z] - (k*t[z][-2]/dr)) / (k/dr - h[z])
+                print('iteration')
+                conv = abs(tr-trold)
+                if max(conv) < tol:
+                    break
+
+        conver = np.abs(t-told)
+        if np.max(conver) < tol:
+            break
         print('ziteration')
 
-    plt.plot(r_list, t[int(z_grid/4)])
+    plt.plot(r_list, t[int(z_grid/4)], label='L/4')
+
+    plt.plot(r_list, t[int(z_grid/2)], label='L/2')
+
+    plt.plot(r_list, t[int(3*z_grid/4)], label='3L/4')
+    plt.legend()
     plt.show()
 
 
